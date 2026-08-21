@@ -32,8 +32,8 @@ function normalizeJikan(item){
   const title=item.title_english||item.title||item.title_japanese||'Untitled Manga';
   const genres=(item.genres||[]).map(g=>g.name);
   const image=item.images?.webp?.large_image_url||item.images?.jpg?.large_image_url||item.images?.webp?.image_url||item.images?.jpg?.image_url||'';
-  const statusMap={Publishing:'RELEASING','Finished:' :'FINISHED'};
-  return {id:item.mal_id,title:{english:title,romaji:item.title||title,native:item.title_japanese||''},coverImage:{large:image,extraLarge:image},description:item.synopsis||'',genres,tags:genres.map(name=>({name})),format:(item.type||'Manga').toUpperCase(),status:statusMap[item.status]||item.status||'',startDate:{year:item.published?.from?new Date(item.published.from).getFullYear():null},averageScore:item.score?Math.round(item.score*10):null,popularity:item.members||0,chapters:item.chapters||null,volumes:item.volumes||null,countryOfOrigin:'JP',source:'Jikan / MyAnimeList'};
+  const statusMap={Publishing:'RELEASING',Finished:'FINISHED'};
+  return {id:item.mal_id,title:{english:title,romaji:item.title||title,native:item.title_japanese||''},coverImage:{large:image,extraLarge:image},description:item.synopsis||'',genres,tags:genres.map(name=>({name})),format:(item.type||'Manga').toUpperCase(),status:statusMap[item.status]||item.status||'',startDate:{year:item.published?.from?new Date(item.published.from).getFullYear():null},averageScore:item.score?Math.round(item.score*10):null,popularity:item.members||0,chapters:item.chapters||null,volumes:item.volumes||null,countryOfOrigin:'JP',source:'jikan'};
 }
 
 async function fetchJikan({page=1,perPage=24,search='',genre='',tag='',sort=['POPULARITY_DESC']}={}){
@@ -66,9 +66,9 @@ async function fetchManga(options={}){
 
 function escapeHTML(value=''){return String(value).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));}
 function titleOf(m){return m.title.english||m.title.romaji||m.title.native||'Untitled Manga'}
-function card(m,index=''){const image=m.coverImage?.extraLarge||m.coverImage?.large||'';return `<article class="card" tabindex="0" data-id="${m.id}"><div class="cover"><img loading="lazy" src="${image}" alt="${escapeHTML(titleOf(m))} cover" onerror="this.onerror=null;this.style.display='none'"><span class="rank">${index?`#${index}`:m.averageScore?`${Math.round(m.averageScore)}%`:'MV'}</span></div><div class="card-title">${escapeHTML(titleOf(m))}</div><div class="card-meta">${escapeHTML(m.format||'MANGA')} · ${escapeHTML(m.status||'')}</div></article>`}
+function card(m,index=''){const image=m.coverImage?.extraLarge||m.coverImage?.large||'';return `<article class="card" tabindex="0" data-id="${m.id}" data-source="${m.source||'anilist'}"><div class="cover"><img loading="lazy" src="${image}" alt="${escapeHTML(titleOf(m))} cover" onerror="this.onerror=null;this.style.display='none'"><span class="rank">${index?`#${index}`:m.averageScore?`${Math.round(m.averageScore)}%`:'MV'}</span></div><div class="card-title">${escapeHTML(titleOf(m))}</div><div class="card-meta">${escapeHTML(m.format||'MANGA')} · ${escapeHTML(m.status||'')}</div></article>`}
 function renderRail(id,media){document.getElementById(id).innerHTML=media.map((m,i)=>card(m,i+1)).join('')}
-function bindCards(root=document){root.querySelectorAll('.card').forEach(el=>{el.onclick=()=>openDetail(Number(el.dataset.id));el.onkeydown=e=>{if(e.key==='Enter')openDetail(Number(el.dataset.id))}})}
+function bindCards(root=document){root.querySelectorAll('.card').forEach(el=>{el.onclick=()=>openDetail(Number(el.dataset.id),el.dataset.source);el.onkeydown=e=>{if(e.key==='Enter')openDetail(Number(el.dataset.id),el.dataset.source)}})}
 
 async function loadHome(){
   try{
@@ -85,10 +85,16 @@ async function loadHome(){
   }catch(err){document.querySelectorAll('.skeleton-row').forEach(x=>x.textContent='Catalogue temporarily unavailable.');console.error(err)}
 }
 
-async function openDetail(id){
+async function openDetail(id,source='anilist'){
   const dialog=document.getElementById('detailDialog'),box=document.getElementById('detailContent');
   box.innerHTML='<p class="eyebrow">LOADING PANEL...</p><h2>Opening story</h2>';dialog.showModal();
   try{
+    if(source==='jikan'){
+      const json=await jikanFetch(`${JIKAN}/manga/${id}/full`);
+      const m=normalizeJikan(json.data);
+      box.innerHTML=`<div class="detail-layout"><img class="detail-cover" src="${m.coverImage.extraLarge}" alt="${escapeHTML(titleOf(m))} cover"><div class="detail-copy"><p class="eyebrow">${escapeHTML(m.format)} · ${escapeHTML(m.status)}</p><h2>${escapeHTML(titleOf(m))}</h2><p>${escapeHTML(m.description||'No description available.')}</p><div class="tags">${m.genres.map(g=>`<span class="tag">${escapeHTML(g)}</span>`).join('')}</div><p><strong>${m.averageScore?`${m.averageScore}% rating`:'No rating'}</strong> · ${m.chapters||'?'} chapters · ${m.volumes||'?'} volumes</p><a class="primary-btn" href="https://myanimelist.net/manga/${id}" target="_blank" rel="noopener">Open source →</a></div></div>`;
+      return;
+    }
     const q=`query($id:Int){Media(id:$id,type:MANGA){title{romaji english native}coverImage{extraLarge}description(asHtml:false)genres tags{name} format status startDate{year}averageScore popularity chapters volumes}}`;
     const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query:q,variables:{id}})});
     if(!res.ok) throw new Error('AniList detail unavailable');
