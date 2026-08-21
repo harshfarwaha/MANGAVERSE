@@ -67,5 +67,22 @@
 
   <dialog id="detailDialog"><div class="detail-inner"><button class="close-btn" id="closeDetail">×</button><div id="detailContent"></div></div></dialog>
   <script src="app.js"></script>
+  <script>
+    // Keep the mature/public-domain collection with the manga discovery sections,
+    // rather than letting the dynamically-created section fall to the page footer.
+    const placeMatureSection = () => {
+      const mature = document.getElementById('matureClassics');
+      if (!mature) return false;
+      const seinen = [...document.querySelectorAll('main > .section')].find(s => s.querySelector('h2')?.textContent.trim() === 'Seinen');
+      if (!seinen) return false;
+      if (mature.previousElementSibling !== seinen) seinen.insertAdjacentElement('afterend', mature);
+      return true;
+    };
+    const matureWatcher = new MutationObserver(() => {
+      if (placeMatureSection()) matureWatcher.disconnect();
+    });
+    matureWatcher.observe(document.querySelector('main'), {childList:true, subtree:true});
+    placeMatureSection();
+  </script>
 </body>
 </html>
