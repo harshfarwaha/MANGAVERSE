@@ -1,144 +1,24 @@
-const API='https://graphql.anilist.co';
-const JIKAN='https://api.jikan.moe/v4';
-const state={page:1,genre:'',tag:'',search:'',perPage:24,loading:false};
-const cache=new Map();
-let jikanNextAt=0;
-
-const query=`query($page:Int,$perPage:Int,$search:String,$genre:String,$tag:String,$sort:[MediaSort]){Page(page:$page,perPage:$perPage){pageInfo{total currentPage lastPage hasNextPage}media(type:MANGA,status_in:[FINISHED,RELEASING,NOT_YET_RELEASED,CANCELLED],search:$search,genre:$genre,tag:$tag,sort:$sort){id title{romaji english native}coverImage{large extraLarge}description(asHtml:false)genres tags{name} format status startDate{year}averageScore popularity chapters volumes countryOfOrigin}}}}`;
-
+const ANILIST_API='https://graphql.anilist.co';const JIKAN_API='https://api.jikan.moe/v4';const state={page:1,perPage:24,search:'',genre:'',tag:'',sort:'POPULARITY_DESC'};const cache=new Map();let jikanNextRequestAt=0;
+const ANILIST_QUERY=`query($page:Int,$perPage:Int,$search:String,$genre:String,$tag:String,$sort:[MediaSort]){Page(page:$page,perPage:$perPage){pageInfo{total currentPage lastPage hasNextPage}media(type:MANGA,search:$search,genre:$genre,tag:$tag,sort:$sort){id siteUrl title{romaji english native}coverImage{large extraLarge}description(asHtml:false)genres tags{name} format status startDate{year}averageScore popularity chapters volumes countryOfOrigin isAdult externalLinks{url site{name} type}}}}`;
+const DETAIL_QUERY=`query($id:Int){Media(id:$id,type:MANGA){id siteUrl title{romaji english native}coverImage{large extraLarge}description(asHtml:false)genres tags{name} format status startDate{year}averageScore popularity chapters volumes countryOfOrigin isAdult externalLinks{url site{name} type}}}`;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-
-async function fetchAniList({page=1,perPage=24,search='',genre='',tag='',sort=['POPULARITY_DESC']}={}){
-  const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query,variables:{page,perPage,search:search||null,genre:genre||null,tag:tag||null,sort}})});
-  if(!res.ok) throw new Error(`AniList request failed (${res.status})`);
-  const json=await res.json();
-  if(json.errors?.length) throw new Error(json.errors[0].message);
-  if(!json.data?.Page) throw new Error('AniList returned no catalogue data');
-  return json.data.Page;
-}
-
-async function jikanFetch(url){
-  const wait=Math.max(0,jikanNextAt-Date.now());
-  if(wait) await sleep(wait);
-  jikanNextAt=Date.now()+400;
-  const res=await fetch(url,{headers:{Accept:'application/json'}});
-  if(!res.ok) throw new Error(`Jikan request failed (${res.status})`);
-  const json=await res.json();
-  if(!json?.data) throw new Error('Jikan returned no manga data');
-  return json;
-}
-
-function normalizeJikan(item){
-  const title=item.title_english||item.title||item.title_japanese||'Untitled Manga';
-  const genres=(item.genres||[]).map(g=>g.name);
-  const image=item.images?.webp?.large_image_url||item.images?.jpg?.large_image_url||item.images?.webp?.image_url||item.images?.jpg?.image_url||'';
-  const statusMap={Publishing:'RELEASING',Finished:'FINISHED'};
-  return {id:item.mal_id,title:{english:title,romaji:item.title||title,native:item.title_japanese||''},coverImage:{large:image,extraLarge:image},description:item.synopsis||'',genres,tags:genres.map(name=>({name})),format:(item.type||'Manga').toUpperCase(),status:statusMap[item.status]||item.status||'',startDate:{year:item.published?.from?new Date(item.published.from).getFullYear():null},averageScore:item.score?Math.round(item.score*10):null,popularity:item.members||0,chapters:item.chapters||null,volumes:item.volumes||null,countryOfOrigin:'JP',source:'jikan'};
-}
-
-async function fetchJikan({page=1,perPage=24,search='',genre='',tag='',sort=['POPULARITY_DESC']}={}){
-  const params=new URLSearchParams({page:String(page),limit:String(Math.min(perPage,25)),sfw:'true'});
-  if(search) params.set('q',search);
-  if(genre) params.set('genres',genre==='Action'?'1':genre==='Fantasy'?'10':genre==='Romance'?'22':genre);
-  if(tag==='Shounen') params.set('genres','27');
-  if(tag==='Seinen') params.set('genres','41');
-  if(sort.includes('START_DATE_DESC')){params.set('order_by','start_date');params.set('sort','desc');}
-  else {params.set('order_by','members');params.set('sort','desc');}
-  const json=await jikanFetch(`${JIKAN}/manga?${params}`);
-  const total=json.pagination?.items?.total||0;
-  const last=json.pagination?.last_visible_page||Math.max(1,Math.ceil(total/perPage));
-  return {media:(json.data||[]).map(normalizeJikan),pageInfo:{total,currentPage:page,lastPage:last,hasNextPage:!!json.pagination?.has_next_page}};
-}
-
-async function fetchManga(options={}){
-  const key=JSON.stringify(options);
-  if(cache.has(key)) return cache.get(key);
-  const promise=(async()=>{
-    try{return await fetchAniList(options);}
-    catch(primaryError){
-      console.warn('AniList unavailable; using Jikan fallback.',primaryError);
-      return await fetchJikan(options);
-    }
-  })();
-  cache.set(key,promise);
-  try{return await promise}catch(err){cache.delete(key);throw err}
-}
-
-function escapeHTML(value=''){return String(value).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));}
-function titleOf(m){return m.title.english||m.title.romaji||m.title.native||'Untitled Manga'}
-function card(m,index=''){const image=m.coverImage?.extraLarge||m.coverImage?.large||'';return `<article class="card" tabindex="0" data-id="${m.id}" data-source="${m.source||'anilist'}"><div class="cover"><img loading="lazy" src="${image}" alt="${escapeHTML(titleOf(m))} cover" onerror="this.onerror=null;this.style.display='none'"><span class="rank">${index?`#${index}`:m.averageScore?`${Math.round(m.averageScore)}%`:'MV'}</span></div><div class="card-title">${escapeHTML(titleOf(m))}</div><div class="card-meta">${escapeHTML(m.format||'MANGA')} · ${escapeHTML(m.status||'')}</div></article>`}
-function renderRail(id,media){document.getElementById(id).innerHTML=media.map((m,i)=>card(m,i+1)).join('')}
-function bindCards(root=document){root.querySelectorAll('.card').forEach(el=>{el.onclick=()=>openDetail(Number(el.dataset.id),el.dataset.source);el.onkeydown=e=>{if(e.key==='Enter')openDetail(Number(el.dataset.id),el.dataset.source)}})}
-
-function addMatureClassics(){
-  if(document.getElementById('matureClassics')) return;
-  const source='https://ftp.digitalcomicmuseum.com/index.php?ACT=dogenresearch&terms=24';
-  const items=[
-    ['3-D Love','Small Publishers','Romance classic','Browse DCM →'],
-    ['Adventures in Romance #001','St. John Publications','Romance classic','Browse DCM →'],
-    ['All For Love — Vol. 1 #01','Prize Comics Group','Romance classic','Browse DCM →'],
-    ['All Romances #01','Ace Magazines','Romance classic','Browse DCM →'],
-    ['All True Romance #002','Comic Media','Romance classic','Browse DCM →'],
-    ['Best Romance #005','Better/Nedor/Standard/Pines','Romance classic','Browse DCM →'],
-    ['Phantom Lady #018','Fox Feature Syndicate','Mature-era superhero / crime','Open issue →']
-  ];
-  const cards=items.map(([title,publisher,genre,label],i)=>{
-    const href=title.startsWith('Phantom Lady')?'https://ftp.digitalcomicmuseum.com/index.php?dlid=12453':source;
-    return `<article class="pdf-card mature-card"><span>18+ · PUBLIC DOMAIN</span><h3>${escapeHTML(title)}</h3><p>${escapeHTML(publisher)} · ${escapeHTML(genre)}</p><a class="primary-btn" href="${href}" target="_blank" rel="noopener noreferrer">${label}</a></article>`;
-  }).join('');
-  const section=document.createElement('section');
-  section.className='section';section.id='matureClassics';
-  section.innerHTML=`<div class="section-head"><div><p class="eyebrow">MATURE CLASSICS · LEGAL ARCHIVE</p><h2>Adult Classics</h2></div><a class="see-all" href="${source}" target="_blank" rel="noopener">Browse archive →</a></div><p class="hero-text" style="margin-top:0">A small collection of mature-era romance, crime and pulp comics from the Digital Comic Museum. The archive says its Golden Age comics have been researched for public-domain status.</p><div class="free-pdf-grid">${cards}</div><div class="manifesto-card" style="margin-top:18px"><p class="eyebrow">READ RESPONSIBLY</p><h2>Historical comics.<br><em>18+ section.</em></h2><p>MangaVerse links to the archive instead of re-uploading files. Availability and access requirements are controlled by the original source.</p></div>`;
-  const manifesto=document.querySelector('.manifesto');
-  (manifesto?.parentNode||document.querySelector('main')).insertBefore(section,manifesto||null);
-}
-
-async function loadHome(){
-  try{
-    const [trending,shonen,seinen,newManga]=await Promise.all([
-      fetchManga({perPage:12,sort:['TRENDING_DESC']}),
-      fetchManga({perPage:12,tag:'Shounen',sort:['POPULARITY_DESC']}),
-      fetchManga({perPage:12,tag:'Seinen',sort:['POPULARITY_DESC']}),
-      fetchManga({perPage:12,sort:['START_DATE_DESC']})
-    ]);
-    renderRail('trendingRail',trending.media);renderRail('shonenRail',shonen.media);renderRail('seinenRail',seinen.media);renderRail('newRail',newManga.media);bindCards();
-    const total=Math.max(trending.pageInfo.total,shonen.pageInfo.total,seinen.pageInfo.total,newManga.pageInfo.total);
-    const count=document.getElementById('catalogCount');if(count) count.textContent=`${total.toLocaleString()}+`;
-    const label=document.getElementById('catalogLabel');if(label) label.textContent=`LIVE CATALOGUE · ${total.toLocaleString()}+ MANGA ENTRIES`;
-  }catch(err){document.querySelectorAll('.skeleton-row').forEach(x=>x.textContent='Catalogue temporarily unavailable.');console.error(err)}
-  addMatureClassics();
-}
-
-async function openDetail(id,source='anilist'){
-  const dialog=document.getElementById('detailDialog'),box=document.getElementById('detailContent');
-  box.innerHTML='<p class="eyebrow">LOADING PANEL...</p><h2>Opening story</h2>';dialog.showModal();
-  try{
-    if(source==='jikan'){
-      const json=await jikanFetch(`${JIKAN}/manga/${id}/full`);
-      const m=normalizeJikan(json.data);
-      box.innerHTML=`<div class="detail-layout"><img class="detail-cover" src="${m.coverImage.extraLarge}" alt="${escapeHTML(titleOf(m))} cover"><div class="detail-copy"><p class="eyebrow">${escapeHTML(m.format)} · ${escapeHTML(m.status)}</p><h2>${escapeHTML(titleOf(m))}</h2><p>${escapeHTML(m.description||'No description available.')}</p><div class="tags">${m.genres.map(g=>`<span class="tag">${escapeHTML(g)}</span>`).join('')}</div><p><strong>${m.averageScore?`${m.averageScore}% rating`:'No rating'}</strong> · ${m.chapters||'?'} chapters · ${m.volumes||'?'} volumes</p><a class="primary-btn" href="https://myanimelist.net/manga/${id}" target="_blank" rel="noopener">Open source →</a></div></div>`;
-      return;
-    }
-    const q=`query($id:Int){Media(id:$id,type:MANGA){title{romaji english native}coverImage{extraLarge}description(asHtml:false)genres tags{name} format status startDate{year}averageScore popularity chapters volumes}}`;
-    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query:q,variables:{id}})});
-    if(!res.ok) throw new Error('AniList detail unavailable');
-    const json=await res.json();if(json.errors?.length) throw new Error(json.errors[0].message);
-    const m=json.data.Media;
-    box.innerHTML=`<div class="detail-layout"><img class="detail-cover" src="${m.coverImage?.extraLarge||''}" alt="${escapeHTML(titleOf(m))} cover"><div class="detail-copy"><p class="eyebrow">${escapeHTML(m.format||'MANGA')} · ${escapeHTML(m.status||'')}</p><h2>${escapeHTML(titleOf(m))}</h2><p>${escapeHTML((m.description||'No description available.').replace(/<[^>]*>/g,''))}</p><div class="tags">${(m.genres||[]).map(g=>`<span class="tag">${escapeHTML(g)}</span>`).join('')}${(m.tags||[]).filter(t=>['Shounen','Seinen','Josei','Shoujo'].includes(t.name)).map(t=>`<span class="tag">${escapeHTML(t.name)}</span>`).join('')}</div><p><strong>${m.averageScore?`${m.averageScore}% rating`:'No rating'}</strong> · ${m.chapters||'?'} chapters · ${m.volumes||'?'} volumes</p><button class="primary-btn" onclick="alert('Reading content will only be connected here when an authorized/public-domain source is available.')">Read from authorized source →</button></div></div>`;
-  }catch(err){box.innerHTML='<h2>Could not open this panel.</h2><p>Please try again.</p>';console.error(err)}
-}
-
-function setupSearch(){
-  const dialog=document.getElementById('searchDialog');
-  const open=()=>{dialog.showModal();setTimeout(()=>document.getElementById('searchInput').focus(),80)};
-  ['openSearch','heroSearch','bottomSearch'].forEach(id=>document.getElementById(id).onclick=open);
-  document.getElementById('closeSearch').onclick=()=>dialog.close();
-  document.getElementById('searchForm').onsubmit=async e=>{e.preventDefault();state.search=document.getElementById('searchInput').value.trim();state.page=1;await search()};
-  document.querySelectorAll('.filter').forEach(btn=>btn.onclick=async()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');state.genre=btn.dataset.genre;state.tag=btn.dataset.tag||'';state.page=1;await search()});
-}
-async function search(){const box=document.getElementById('searchResults');box.innerHTML='<p class="eyebrow">SEARCHING THE VERSE...</p>';try{const data=await fetchManga({page:state.page,perPage:state.perPage,search:state.search,genre:state.genre,tag:state.tag,sort:['POPULARITY_DESC']});box.innerHTML=`<p class="eyebrow">${data.pageInfo.total.toLocaleString()} CATALOGUE ENTRIES · PAGE ${data.pageInfo.currentPage}/${data.pageInfo.lastPage}</p>`+data.media.map(m=>card(m)).join('')+(data.pageInfo.hasNextPage?`<button class="page-btn" id="nextPage">Load more</button>`:'');bindCards(box);document.getElementById('nextPage')?.addEventListener('click',async()=>{state.page++;await search()})}catch(err){box.innerHTML='<p>Search is temporarily unavailable.</p>';console.error(err)}}
-
-document.querySelectorAll('.see-all').forEach(btn=>btn.onclick=()=>{document.getElementById('searchDialog').showModal();state.search='';state.genre='';state.tag=btn.dataset.query==='SEINEN'?'Seinen':btn.dataset.query==='SHONEN'?'Shounen':'';document.getElementById('searchInput').value='';document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));document.querySelector('.filter[data-tag="'+state.tag+'"]')?.classList.add('active');search()});
-document.getElementById('exploreBtn').onclick=()=>document.getElementById('explore').scrollIntoView({behavior:'smooth'});
-document.getElementById('closeDetail').onclick=()=>document.getElementById('detailDialog').close();
-setupSearch();loadHome();
+function esc(v=''){return String(v).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));}function titleOf(m){return m?.title?.english||m?.title?.romaji||m?.title?.native||'Untitled Manga';}function imageOf(m){return m?.coverImage?.extraLarge||m?.coverImage?.large||'';}function clean(v=''){return String(v).replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();}
+async function fetchAniList(o={}){const variables={page:o.page||1,perPage:Math.min(o.perPage||24,50),search:o.search||null,genre:o.genre||null,tag:o.tag||null,sort:[o.sort||'POPULARITY_DESC']};const r=await fetch(ANILIST_API,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query:ANILIST_QUERY,variables})});if(!r.ok)throw Error(`AniList HTTP ${r.status}`);const j=await r.json();if(j.errors?.length)throw Error(j.errors[0].message);return {...j.data.Page,media:(j.data.Page.media||[]).map(x=>({...x,source:'anilist'}))};}
+async function jikanFetch(url){const wait=Math.max(0,jikanNextRequestAt-Date.now());if(wait)await sleep(wait);jikanNextRequestAt=Date.now()+700;const r=await fetch(url,{headers:{Accept:'application/json'}});if(!r.ok)throw Error(`Jikan HTTP ${r.status}`);const j=await r.json();if(!j?.data)throw Error('Jikan returned no data');return j;}
+function genreId(n){return{Action:1,Adventure:2,Comedy:4,Drama:8,Fantasy:10,Horror:14,Mystery:7,Romance:22,SciFi:24,Sports:30,Supernatural:37,Psychological:40,Shounen:27,Seinen:42,Shoujo:25,Josei:43}[n]||null;}
+function normalizeJikan(x){const img=x.images?.webp?.large_image_url||x.images?.jpg?.large_image_url||'';const t=x.title_english||x.title||x.title_japanese||'Untitled Manga';const genres=(x.genres||[]).map(g=>g.name);return{id:x.mal_id,source:'jikan',siteUrl:`https://myanimelist.net/manga/${x.mal_id}`,title:{english:t,romaji:x.title||t,native:x.title_japanese||''},coverImage:{large:img,extraLarge:img},description:x.synopsis||'',genres,tags:genres.map(name=>({name})),format:(x.type||'MANGA').toUpperCase(),status:x.status||'',startDate:{year:x.published?.from?new Date(x.published.from).getFullYear():null},averageScore:x.score?Math.round(x.score*10):null,popularity:x.members||0,chapters:x.chapters||null,volumes:x.volumes||null,countryOfOrigin:'JP',isAdult:false,externalLinks:[{url:`https://myanimelist.net/manga/${x.mal_id}`,site:{name:'MyAnimeList'},type:'INFO'}]};}
+async function fetchJikan(o={}){const p=new URLSearchParams({page:String(o.page||1),limit:String(Math.min(o.perPage||24,25)),sfw:'true'});if(o.search)p.set('q',o.search);if(o.sort==='START_DATE_DESC'){p.set('order_by','start_date');p.set('sort','desc');}else{p.set('order_by','members');p.set('sort','desc');}const gid=genreId(o.tag||o.genre);if(gid)p.set('genres',String(gid));const j=await jikanFetch(`${JIKAN_API}/manga?${p}`);const total=j.pagination?.items?.total||0;return{media:(j.data||[]).map(normalizeJikan),pageInfo:{total,currentPage:o.page||1,lastPage:j.pagination?.last_visible_page||1,hasNextPage:!!j.pagination?.has_next_page}};}
+async function fetchManga(o={}){const key=JSON.stringify(o);if(cache.has(key))return cache.get(key);const p=(async()=>{try{return await fetchAniList(o);}catch(e){console.warn('AniList failed; Jikan fallback',e);return fetchJikan(o);}})();cache.set(key,p);try{return await p;}catch(e){cache.delete(key);throw e;}}
+function linksOf(m){const a=[];const seen=new Set();for(const l of(m.externalLinks||[])){if(/^https?:\/\//i.test(l?.url||'')&&!seen.has(l.url)){seen.add(l.url);a.push({url:l.url,name:l.site?.name||'Source'});}}if(m.siteUrl&&!seen.has(m.siteUrl))a.unshift({url:m.siteUrl,name:m.source==='jikan'?'MyAnimeList':'AniList'});return a.slice(0,3);}
+function card(m,i=''){const img=imageOf(m),t=titleOf(m);return `<article class="card" tabindex="0" data-id="${Number(m.id)}" data-source="${esc(m.source||'anilist')}"><div class="cover">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(t)} cover" onerror="this.onerror=null;this.remove();this.parentElement.classList.add('no-cover')">`:'<div class="cover-fallback">MV</div>'}<span class="rank">${i?`#${i}`:m.averageScore?`${Math.round(m.averageScore)}%`:'MV'}</span>${m.isAdult?'<span class="card-badge adult">18+</span>':''}</div><div class="card-title">${esc(t)}</div><div class="card-meta">${esc(m.format||'MANGA')} · ${esc(m.status||'UNKNOWN')}</div></article>`;}
+function dedupe(a){const s=new Set();return(a||[]).filter(x=>{const k=`${x.source}:${x.id}`;if(s.has(k))return false;s.add(k);return true;});}
+function bindCards(root=document){root.querySelectorAll('.card').forEach(el=>{if(el.dataset.bound)return;el.dataset.bound='1';const open=()=>openDetail(Number(el.dataset.id),el.dataset.source);el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};});}
+function renderRail(id,media){const el=document.getElementById(id);if(!el)return;const a=dedupe(media);el.innerHTML=a.length?a.map((m,i)=>card(m,i+1)).join(''):'<div class="empty-state">No manga found.</div>';bindCards(el);}
+async function loadSection(id,o){try{const r=await fetchManga(o);renderRail(id,r.media);return r;}catch(e){console.error(id,e);const el=document.getElementById(id);if(el)el.innerHTML='<div class="empty-state error-state">Unable to load this section. Use Search to retry.</div>';return{media:[],pageInfo:{total:0}};}}
+async function loadHome(){const r=await Promise.all([loadSection('trendingRail',{page:1,perPage:18,sort:'POPULARITY_DESC'}),loadSection('shonenRail',{page:1,perPage:18,tag:'Shounen',sort:'POPULARITY_DESC'}),loadSection('seinenRail',{page:1,perPage:18,tag:'Seinen',sort:'POPULARITY_DESC'}),loadSection('actionRail',{page:1,perPage:18,genre:'Action',sort:'POPULARITY_DESC'}),loadSection('fantasyRail',{page:1,perPage:18,genre:'Fantasy',sort:'POPULARITY_DESC'}),loadSection('romanceRail',{page:1,perPage:18,genre:'Romance',sort:'POPULARITY_DESC'}),loadSection('newRail',{page:1,perPage:18,sort:'START_DATE_DESC'})]);const total=Math.max(...r.map(x=>x.pageInfo?.total||0),0);if(total){document.getElementById('catalogCount')?.replaceChildren(document.createTextNode(`${total.toLocaleString()}+`));const l=document.getElementById('catalogLabel');if(l)l.textContent=`LIVE CATALOGUE · ${total.toLocaleString()}+ MANGA ENTRIES`;}addMatureClassics();}
+async function getDetail(id,source){if(source==='jikan'){const j=await jikanFetch(`${JIKAN_API}/manga/${id}/full`);return normalizeJikan(j.data);}const r=await fetch(ANILIST_API,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query:DETAIL_QUERY,variables:{id}})});if(!r.ok)throw Error(`Detail HTTP ${r.status}`);const j=await r.json();if(j.errors?.length||!j.data?.Media)throw Error('Manga details unavailable');return{...j.data.Media,source:'anilist'};}
+async function openDetail(id,source='anilist'){const d=document.getElementById('detailDialog'),b=document.getElementById('detailContent');if(!d||!b)return;b.innerHTML='<p class="eyebrow">LOADING PANEL...</p><h2>Opening story</h2>';d.showModal();try{const m=await getDetail(id,source),title=titleOf(m),links=linksOf(m),genres=[...new Set([...(m.genres||[]),...(m.tags||[]).map(x=>x.name)])].slice(0,10);b.innerHTML=`<div class="detail-layout"><img class="detail-cover" src="${esc(imageOf(m))}" alt="${esc(title)} cover"><div class="detail-copy"><p class="eyebrow">${esc(m.format||'MANGA')} · ${esc(m.status||'UNKNOWN')}</p><h2>${esc(title)}</h2><p>${esc(clean(m.description||'No description available.'))}</p><div class="tags">${genres.map(g=>`<span class="tag">${esc(g)}</span>`).join('')}</div><div class="detail-stats"><span>★ ${m.averageScore?`${Math.round(m.averageScore)}%`:'—'}</span><span>Ch. ${m.chapters||'—'}</span><span>Vol. ${m.volumes||'—'}</span></div><div class="source-actions">${links.length?links.map(l=>`<a class="primary-btn source-btn" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">Open ${esc(l.name)} →</a>`).join(''):'<span class="source-note">No external source is listed for this title.</span>'}</div><p class="source-note">MangaVerse does not host copyrighted chapters. These buttons open sources listed by the metadata provider.</p></div></div>`;}catch(e){console.error(e);b.innerHTML='<div class="empty-state error-state"><h2>Could not open this manga.</h2><p>The source is temporarily unavailable. Please try again.</p></div>';}}
+async function search(){const box=document.getElementById('searchResults');if(!box)return;box.innerHTML='<div class="search-loading">SEARCHING THE VERSE...</div>';try{const d=await fetchManga({page:state.page,perPage:state.perPage,search:state.search,genre:state.genre,tag:state.tag,sort:state.sort}),m=dedupe(d.media);box.innerHTML=`<div class="search-summary"><span>${(d.pageInfo?.total||0).toLocaleString()} results</span><span>Page ${d.pageInfo?.currentPage||1} / ${d.pageInfo?.lastPage||1}</span></div><div class="search-grid">${m.map(x=>card(x)).join('')}</div><div class="pagination"><button class="page-btn" id="previousPage" ${state.page<=1?'disabled':''}>← Previous</button><button class="page-btn" id="nextPage" ${d.pageInfo?.hasNextPage?'':'disabled'}>Next →</button></div>`;bindCards(box);document.getElementById('previousPage')?.addEventListener('click',async()=>{if(state.page>1){state.page--;await search();}});document.getElementById('nextPage')?.addEventListener('click',async()=>{if(d.pageInfo?.hasNextPage){state.page++;await search();}});}catch(e){console.error(e);box.innerHTML='<div class="empty-state error-state">Search is temporarily unavailable.</div>';}}
+function addMatureClassics(){if(document.getElementById('matureClassics'))return;const main=document.querySelector('main');if(!main)return;const s=document.createElement('section');s.className='section';s.id='matureClassics';s.innerHTML=`<div class="section-head"><div><p class="eyebrow">MATURE CLASSICS · LEGAL ARCHIVE</p><h2>Adult Classics</h2></div><a class="see-all" href="https://digitalcomicmuseum.com/" target="_blank" rel="noopener noreferrer">Browse archive →</a></div><p class="hero-text section-note">Historical mature-era comics from a public-domain archive. MangaVerse links to the original host.</p><div class="free-pdf-grid mature-grid">${['3-D Love','Adventures in Romance #001','All For Love #01','All Romances #01','All True Romance #002','Best Romance #005','Phantom Lady #018'].map(t=>`<article class="pdf-card mature-card"><span>18+ · ARCHIVE</span><h3>${esc(t)}</h3><p>Historical romance / pulp / crime</p><a class="primary-btn" href="https://digitalcomicmuseum.com/" target="_blank" rel="noopener noreferrer">Open archive →</a></article>`).join('')}</div>`;const seinen=[...main.querySelectorAll('.section')].find(x=>x.querySelector('h2')?.textContent.trim()==='Seinen');if(seinen)seinen.insertAdjacentElement('afterend',s);else main.appendChild(s);}
+function setup(){const dialog=document.getElementById('searchDialog');const open=()=>{dialog?.showModal();setTimeout(()=>document.getElementById('searchInput')?.focus(),100);};['openSearch','heroSearch','bottomSearch'].forEach(id=>document.getElementById(id)?.addEventListener('click',open));document.getElementById('closeSearch')?.addEventListener('click',()=>dialog?.close());document.getElementById('searchForm')?.addEventListener('submit',async e=>{e.preventDefault();state.search=document.getElementById('searchInput')?.value.trim()||'';state.page=1;await search();});document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',async()=>{state.genre=btn.dataset.genre||'';state.tag=btn.dataset.tag||'';state.sort='POPULARITY_DESC';state.page=1;document.querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===btn));await search();}));document.querySelectorAll('.see-all[data-query]').forEach(btn=>btn.addEventListener('click',async e=>{e.preventDefault();dialog?.showModal();state.search='';state.page=1;state.genre='';state.tag='';state.sort='POPULARITY_DESC';const q=btn.dataset.query;if(q==='SHONEN')state.tag='Shounen';if(q==='SEINEN')state.tag='Seinen';if(q==='ACTION')state.genre='Action';if(q==='FANTASY')state.genre='Fantasy';if(q==='ROMANCE')state.genre='Romance';if(q==='NEW')state.sort='START_DATE_DESC';document.getElementById('searchInput').value='';await search();}));document.getElementById('exploreBtn')?.addEventListener('click',()=>document.getElementById('explore')?.scrollIntoView({behavior:'smooth'}));document.getElementById('closeDetail')?.addEventListener('click',()=>document.getElementById('detailDialog')?.close());}
+setup();loadHome();
