@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#09090d">
+  <title>MangaVerse — Free & Public Domain Reads</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body{background:#09090d;color:#f4f4f5}.pd-wrap{max-width:1180px;margin:auto;padding:92px 18px 110px}.pd-head{max-width:760px;margin-bottom:34px}.pd-head h1{font-size:clamp(42px,9vw,88px);line-height:.9;margin:8px 0 18px}.pd-head em{font-style:normal;color:#e5e7eb}.pd-note{color:#a1a1aa;line-height:1.65}.pd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}.pd-card{background:#111116;border:1px solid #27272a;border-radius:18px;padding:14px;display:flex;flex-direction:column;min-height:330px;box-shadow:0 16px 50px #0005}.pd-cover{height:220px;border-radius:12px;background:linear-gradient(135deg,#18181b,#27272a);display:grid;place-items:center;overflow:hidden;position:relative}.pd-cover:after{content:'PUBLIC DOMAIN';position:absolute;left:10px;top:10px;font:700 10px/1 Rajdhani,sans-serif;letter-spacing:.12em;background:#e11d48;color:#fff;padding:7px 8px;border-radius:6px}.pd-cover span{font:800 42px/1 Rajdhani,sans-serif;opacity:.18}.pd-card h2{font-size:19px;margin:15px 2px 6px}.pd-meta{color:#a1a1aa;font-size:13px;line-height:1.45;margin:0 2px 14px}.pd-btn{margin-top:auto;text-decoration:none;text-align:center;background:#f4f4f5;color:#09090d;padding:12px 14px;border-radius:10px;font-weight:800}.pd-btn:hover{transform:translateY(-1px)}.pd-source{font-size:11px;color:#71717a;margin-top:10px;text-align:center}.pd-back{display:inline-flex;color:#d4d4d8;text-decoration:none;margin-bottom:20px}.pd-count{font-family:Rajdhani,sans-serif;letter-spacing:.08em;color:#e11d48;font-weight:700}.pd-footer{margin-top:60px;color:#71717a;text-align:center;font-size:12px}.pd-nav{position:fixed;top:0;left:0;right:0;z-index:5;background:#09090de8;border-bottom:1px solid #27272a;padding:14px 18px;backdrop-filter:blur(16px)}.pd-nav a{color:#f4f4f5;text-decoration:none;font-weight:800}
+  </style>
+</head>
+<body>
+  <nav class="pd-nav"><a href="index.html">← MangaVerse</a></nav>
+  <main class="pd-wrap">
+    <div class="pd-head">
+      <p class="eyebrow">LEGAL READING COLLECTION</p>
+      <h1>Free & <em>Public Domain.</em></h1>
+      <p class="pd-note">A curated collection of digitized historical Japanese illustrated works that are identified by their source institutions as public domain/CC0. MangaVerse links directly to the original digitized reader so the source and licensing information remain visible.</p>
+      <p class="pd-count" id="count"></p>
+    </div>
+    <section class="pd-grid" id="grid"></section>
+    <p class="pd-footer">Sources: Smithsonian Libraries and Archives. Always check the source page's current reuse terms before redistribution.</p>
+  </main>
+  <script src="public-domain.js"></script>
+</body>
+</html>

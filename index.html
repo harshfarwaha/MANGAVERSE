@@ -15,7 +15,7 @@
   <div class="grain" aria-hidden="true"></div>
   <header class="topbar">
     <a class="brand" href="#home" aria-label="MangaVerse home"><span class="brand-mark">MV</span><span>MANGA<span>VERSE</span></span></a>
-    <nav class="desktop-nav" aria-label="Primary"><a href="#home">Home</a><a href="#explore">Explore</a><a href="#trending">Trending</a><a href="#library">Library</a></nav>
+    <nav class="desktop-nav" aria-label="Primary"><a href="#home">Home</a><a href="#explore">Explore</a><a href="#trending">Trending</a><a href="#freeReads">Free Reads</a></nav>
     <button class="icon-btn" id="openSearch" aria-label="Search">⌕</button>
   </header>
 
@@ -29,12 +29,15 @@
     <section class="section" id="explore"><div class="section-head"><div><p class="eyebrow">CHOOSE YOUR WORLD</p><h2>Shōnen</h2></div><button class="see-all" data-query="SHONEN">See all →</button></div><div class="rail" id="shonenRail"><div class="skeleton-row"></div></div></section>
     <section class="section"><div class="section-head"><div><p class="eyebrow">FOR THE DARKER STORIES</p><h2>Seinen</h2></div><button class="see-all" data-query="SEINEN">See all →</button></div><div class="rail" id="seinenRail"><div class="skeleton-row"></div></div></section>
     <section class="section"><div class="section-head"><div><p class="eyebrow">FRESH PANELS</p><h2>New & Rising</h2></div><button class="see-all" data-query="NEW">See all →</button></div><div class="rail" id="newRail"><div class="skeleton-row"></div></div></section>
+
+    <section class="section" id="freeReads"><div class="section-head"><div><p class="eyebrow">LEGAL READING COLLECTION</p><h2>Free & Public Domain</h2></div><a class="see-all" href="public-domain.html">Explore reads →</a></div><div class="manifesto-card"><span class="panel-number">PD</span><p class="eyebrow">MANGAVERSE READER</p><h2>Historical manga.<br><em>Actually readable.</em></h2><p>Browse a curated public-domain collection and open the original digitized reader from Smithsonian Libraries and Archives.</p><a class="primary-btn" href="public-domain.html">Open Free Reads <span>→</span></a></div></section>
+
     <section class="section manifesto"><div class="manifesto-card"><span class="panel-number">01</span><p class="eyebrow">MANGAVERSE</p><h2><span id="catalogCount">10,000+</span> stories.<br><em>One universe.</em></h2><p>The catalogue is live and paginated: MangaVerse loads manga metadata and covers on demand instead of shipping thousands of records with the website.</p></div></section>
   </main>
 
   <footer><span>© MangaVerse</span><span>Like what you see? <strong>Made by HARSH</strong></span></footer>
 
-  <nav class="bottom-nav" aria-label="Mobile navigation"><a class="active" href="#home">⌂<span>Home</span></a><a href="#explore">◈<span>Explore</span></a><button id="bottomSearch">⌕<span>Search</span></button><a href="#trending">✦<span>Trending</span></a><a href="#library">♡<span>Library</span></a></nav>
+  <nav class="bottom-nav" aria-label="Mobile navigation"><a class="active" href="#home">⌂<span>Home</span></a><a href="#explore">◈<span>Explore</span></a><button id="bottomSearch">⌕<span>Search</span></button><a href="#trending">✦<span>Trending</span></a><a href="#freeReads">◉<span>Free Reads</span></a></nav>
 
   <dialog id="searchDialog"><div class="dialog-inner"><button class="close-btn" id="closeSearch">×</button><p class="eyebrow">SEARCH THE VERSE</p><h2>What are you<br><em>looking for?</em></h2><form id="searchForm"><input id="searchInput" autocomplete="off" placeholder="Title, author, manga..." /><button class="primary-btn">Search →</button></form><div class="filter-row"><button class="filter active" data-genre="" data-tag="">All</button><button class="filter" data-genre="Action">Action</button><button class="filter" data-genre="Fantasy">Fantasy</button><button class="filter" data-genre="" data-tag="Shounen">Shōnen</button><button class="filter" data-genre="" data-tag="Seinen">Seinen</button><button class="filter" data-genre="Romance">Romance</button></div><div id="searchResults" class="search-results"></div></div></dialog>
 
