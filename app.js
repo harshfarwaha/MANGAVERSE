@@ -1,22 +1,72 @@
 const API='https://graphql.anilist.co';
+const JIKAN='https://api.jikan.moe/v4';
 const state={page:1,genre:'',tag:'',search:'',perPage:24,loading:false};
 const cache=new Map();
+let jikanNextAt=0;
 
 const query=`query($page:Int,$perPage:Int,$search:String,$genre:String,$tag:String,$sort:[MediaSort]){Page(page:$page,perPage:$perPage){pageInfo{total currentPage lastPage hasNextPage}media(type:MANGA,status_in:[FINISHED,RELEASING,NOT_YET_RELEASED,CANCELLED],search:$search,genre:$genre,tag:$tag,sort:$sort){id title{romaji english native}coverImage{large extraLarge}description(asHtml:false)genres tags{name} format status startDate{year}averageScore popularity chapters volumes countryOfOrigin}}}}`;
 
-async function fetchManga({page=1,perPage=24,search='',genre='',tag='',sort=['POPULARITY_DESC']}={}){
-  const key=JSON.stringify({page,perPage,search,genre,tag,sort});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function fetchAniList({page=1,perPage=24,search='',genre='',tag='',sort=['POPULARITY_DESC']}={}){
+  const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query,variables:{page,perPage,search:search||null,genre:genre||null,tag:tag||null,sort}})});
+  if(!res.ok) throw new Error(`AniList request failed (${res.status})`);
+  const json=await res.json();
+  if(json.errors?.length) throw new Error(json.errors[0].message);
+  if(!json.data?.Page) throw new Error('AniList returned no catalogue data');
+  return json.data.Page;
+}
+
+async function jikanFetch(url){
+  const wait=Math.max(0,jikanNextAt-Date.now());
+  if(wait) await sleep(wait);
+  jikanNextAt=Date.now()+400;
+  const res=await fetch(url,{headers:{Accept:'application/json'}});
+  if(!res.ok) throw new Error(`Jikan request failed (${res.status})`);
+  const json=await res.json();
+  if(!json?.data) throw new Error('Jikan returned no manga data');
+  return json;
+}
+
+function normalizeJikan(item){
+  const title=item.title_english||item.title||item.title_japanese||'Untitled Manga';
+  const genres=(item.genres||[]).map(g=>g.name);
+  const image=item.images?.webp?.large_image_url||item.images?.jpg?.large_image_url||item.images?.webp?.image_url||item.images?.jpg?.image_url||'';
+  const statusMap={Publishing:'RELEASING','Finished:' :'FINISHED'};
+  return {id:item.mal_id,title:{english:title,romaji:item.title||title,native:item.title_japanese||''},coverImage:{large:image,extraLarge:image},description:item.synopsis||'',genres,tags:genres.map(name=>({name})),format:(item.type||'Manga').toUpperCase(),status:statusMap[item.status]||item.status||'',startDate:{year:item.published?.from?new Date(item.published.from).getFullYear():null},averageScore:item.score?Math.round(item.score*10):null,popularity:item.members||0,chapters:item.chapters||null,volumes:item.volumes||null,countryOfOrigin:'JP',source:'Jikan / MyAnimeList'};
+}
+
+async function fetchJikan({page=1,perPage=24,search='',genre='',tag='',sort=['POPULARITY_DESC']}={}){
+  const params=new URLSearchParams({page:String(page),limit:String(Math.min(perPage,25)),sfw:'true'});
+  if(search) params.set('q',search);
+  if(genre) params.set('genres',genre==='Action'?'1':genre==='Fantasy'?'10':genre==='Romance'?'22':genre);
+  if(tag==='Shounen') params.set('genres','27');
+  if(tag==='Seinen') params.set('genres','41');
+  if(sort.includes('START_DATE_DESC')){params.set('order_by','start_date');params.set('sort','desc');}
+  else {params.set('order_by','members');params.set('sort','desc');}
+  const json=await jikanFetch(`${JIKAN}/manga?${params}`);
+  const total=json.pagination?.items?.total||0;
+  const last=json.pagination?.last_visible_page||Math.max(1,Math.ceil(total/perPage));
+  return {media:(json.data||[]).map(normalizeJikan),pageInfo:{total,currentPage:page,lastPage:last,hasNextPage:!!json.pagination?.has_next_page}};
+}
+
+async function fetchManga(options={}){
+  const key=JSON.stringify(options);
   if(cache.has(key)) return cache.get(key);
-  const promise=fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,variables:{page,perPage,search:search||null,genre:genre||null,tag:tag||null,sort}})})
-    .then(async res=>{if(!res.ok) throw new Error(`Catalogue request failed (${res.status})`);return res.json()})
-    .then(json=>{if(json.errors?.length) throw new Error(json.errors[0].message);return json.data.Page;});
+  const promise=(async()=>{
+    try{return await fetchAniList(options);}
+    catch(primaryError){
+      console.warn('AniList unavailable; using Jikan fallback.',primaryError);
+      return await fetchJikan(options);
+    }
+  })();
   cache.set(key,promise);
   try{return await promise}catch(err){cache.delete(key);throw err}
 }
 
-function escapeHTML(value=''){return String(value).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}
+function escapeHTML(value=''){return String(value).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));}
 function titleOf(m){return m.title.english||m.title.romaji||m.title.native||'Untitled Manga'}
-function card(m,index=''){return `<article class="card" tabindex="0" data-id="${m.id}"><div class="cover"><img loading="lazy" src="${m.coverImage?.extraLarge||m.coverImage?.large||''}" alt="${escapeHTML(titleOf(m))} cover" onerror="this.style.display='none'"><span class="rank">${index?`#${index}`:m.averageScore?`${Math.round(m.averageScore)}%`:'MV'}</span></div><div class="card-title">${escapeHTML(titleOf(m))}</div><div class="card-meta">${escapeHTML(m.format||'MANGA')} · ${escapeHTML(m.status||'')}</div></article>`}
+function card(m,index=''){const image=m.coverImage?.extraLarge||m.coverImage?.large||'';return `<article class="card" tabindex="0" data-id="${m.id}"><div class="cover"><img loading="lazy" src="${image}" alt="${escapeHTML(titleOf(m))} cover" onerror="this.onerror=null;this.style.display='none'"><span class="rank">${index?`#${index}`:m.averageScore?`${Math.round(m.averageScore)}%`:'MV'}</span></div><div class="card-title">${escapeHTML(titleOf(m))}</div><div class="card-meta">${escapeHTML(m.format||'MANGA')} · ${escapeHTML(m.status||'')}</div></article>`}
 function renderRail(id,media){document.getElementById(id).innerHTML=media.map((m,i)=>card(m,i+1)).join('')}
 function bindCards(root=document){root.querySelectorAll('.card').forEach(el=>{el.onclick=()=>openDetail(Number(el.dataset.id));el.onkeydown=e=>{if(e.key==='Enter')openDetail(Number(el.dataset.id))}})}
 
@@ -36,11 +86,14 @@ async function loadHome(){
 }
 
 async function openDetail(id){
-  const dialog=document.getElementById('detailDialog'), box=document.getElementById('detailContent');
+  const dialog=document.getElementById('detailDialog'),box=document.getElementById('detailContent');
   box.innerHTML='<p class="eyebrow">LOADING PANEL...</p><h2>Opening story</h2>';dialog.showModal();
   try{
     const q=`query($id:Int){Media(id:$id,type:MANGA){title{romaji english native}coverImage{extraLarge}description(asHtml:false)genres tags{name} format status startDate{year}averageScore popularity chapters volumes}}`;
-    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,variables:{id}})});const json=await res.json();const m=json.data.Media;
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query:q,variables:{id}})});
+    if(!res.ok) throw new Error('AniList detail unavailable');
+    const json=await res.json();if(json.errors?.length) throw new Error(json.errors[0].message);
+    const m=json.data.Media;
     box.innerHTML=`<div class="detail-layout"><img class="detail-cover" src="${m.coverImage?.extraLarge||''}" alt="${escapeHTML(titleOf(m))} cover"><div class="detail-copy"><p class="eyebrow">${escapeHTML(m.format||'MANGA')} · ${escapeHTML(m.status||'')}</p><h2>${escapeHTML(titleOf(m))}</h2><p>${escapeHTML((m.description||'No description available.').replace(/<[^>]*>/g,''))}</p><div class="tags">${(m.genres||[]).map(g=>`<span class="tag">${escapeHTML(g)}</span>`).join('')}${(m.tags||[]).filter(t=>['Shounen','Seinen','Josei','Shoujo'].includes(t.name)).map(t=>`<span class="tag">${escapeHTML(t.name)}</span>`).join('')}</div><p><strong>${m.averageScore?`${m.averageScore}% rating`:'No rating'}</strong> · ${m.chapters||'?'} chapters · ${m.volumes||'?'} volumes</p><button class="primary-btn" onclick="alert('Reading content will only be connected here when an authorized/public-domain source is available.')">Read from authorized source →</button></div></div>`;
   }catch(err){box.innerHTML='<h2>Could not open this panel.</h2><p>Please try again.</p>';console.error(err)}
 }
