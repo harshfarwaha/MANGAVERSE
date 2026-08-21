@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#09090d" />
-  <meta name="description" content="MangaVerse — discover Shōnen, Seinen and public-domain manga." />
+  <meta name="description" content="MangaVerse — discover Shōnen, Seinen, action, fantasy, romance and public-domain manga." />
   <title>MangaVerse — Beyond the Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -21,68 +21,39 @@
 
   <main id="home">
     <section class="hero" aria-labelledby="heroTitle">
-      <div class="hero-copy"><p class="eyebrow" id="catalogLabel">LIVE CATALOGUE · LOADING MANGA</p><h1 id="heroTitle">Find your<br><em>next story.</em></h1><p class="hero-text">Discover Shōnen, Seinen and thousands of manga worlds — curated for the way you read.</p><div class="hero-actions"><button class="primary-btn" id="exploreBtn">Explore Manga <span>→</span></button><button class="ghost-btn" id="heroSearch">Search</button></div></div>
+      <div class="hero-copy"><p class="eyebrow" id="catalogLabel">LIVE CATALOGUE · LOADING MANGA</p><h1 id="heroTitle">Find your<br><em>next story.</em></h1><p class="hero-text">A large live manga catalogue, arranged by story type, genre and popularity — built for mobile reading and discovery.</p><div class="hero-actions"><button class="primary-btn" id="exploreBtn">Explore Manga <span>→</span></button><button class="ghost-btn" id="heroSearch">Search</button></div></div>
       <div class="hero-art" aria-hidden="true"><div class="panel p1"></div><div class="panel p2"></div><div class="panel p3"></div><div class="speed-lines"></div><span class="hero-word">MANGA</span></div>
     </section>
 
     <section class="section" id="trending"><div class="section-head"><div><p class="eyebrow">RIGHT NOW</p><h2>Trending</h2></div><button class="see-all" data-query="TRENDING">See all →</button></div><div class="rail" id="trendingRail"><div class="skeleton-row"></div></div></section>
-    <section class="section" id="explore"><div class="section-head"><div><p class="eyebrow">CHOOSE YOUR WORLD</p><h2>Shōnen</h2></div><button class="see-all" data-query="SHONEN">See all →</button></div><div class="rail" id="shonenRail"><div class="skeleton-row"></div></div></section>
-    <section class="section"><div class="section-head"><div><p class="eyebrow">FOR THE DARKER STORIES</p><h2>Seinen</h2></div><button class="see-all" data-query="SEINEN">See all →</button></div><div class="rail" id="seinenRail"><div class="skeleton-row"></div></div></section>
+    <section class="section" id="explore"><div class="section-head"><div><p class="eyebrow">BATTLE · FRIENDSHIP · GROWTH</p><h2>Shōnen</h2></div><button class="see-all" data-query="SHONEN">See all →</button></div><div class="rail" id="shonenRail"><div class="skeleton-row"></div></div></section>
+    <section class="section"><div class="section-head"><div><p class="eyebrow">DARKER · MATURE · COMPLEX</p><h2>Seinen</h2></div><button class="see-all" data-query="SEINEN">See all →</button></div><div class="rail" id="seinenRail"><div class="skeleton-row"></div></div></section>
+    <section class="section"><div class="section-head"><div><p class="eyebrow">HIGH ENERGY</p><h2>Action</h2></div><button class="see-all" data-query="ACTION">See all →</button></div><div class="rail" id="actionRail"><div class="skeleton-row"></div></div></section>
+    <section class="section"><div class="section-head"><div><p class="eyebrow">WORLDS BEYOND REALITY</p><h2>Fantasy</h2></div><button class="see-all" data-query="FANTASY">See all →</button></div><div class="rail" id="fantasyRail"><div class="skeleton-row"></div></div></section>
+    <section class="section"><div class="section-head"><div><p class="eyebrow">HEART · DRAMA · RELATIONSHIPS</p><h2>Romance</h2></div><button class="see-all" data-query="ROMANCE">See all →</button></div><div class="rail" id="romanceRail"><div class="skeleton-row"></div></div></section>
     <section class="section"><div class="section-head"><div><p class="eyebrow">FRESH PANELS</p><h2>New & Rising</h2></div><button class="see-all" data-query="NEW">See all →</button></div><div class="rail" id="newRail"><div class="skeleton-row"></div></div></section>
 
     <section class="section" id="freeReads">
-      <div class="section-head"><div><p class="eyebrow">VERIFIED PUBLIC DOMAIN</p><h2>Free PDF Reads</h2></div><a class="see-all" href="https://library.si.edu/digital-library/collection/japanese-illustrated-books/list" target="_blank" rel="noopener">Browse collection →</a></div>
-      <p class="hero-text" style="margin-top:0">These editions are hosted by Smithsonian Libraries and Archives. Tap a card to open the official online reader/download page.</p>
+      <div class="section-head"><div><p class="eyebrow">VERIFIED PUBLIC DOMAIN</p><h2>Free PDF Reads</h2></div><a class="see-all" href="https://library.si.edu/digital-library/collection/japanese-illustrated-books/list" target="_blank" rel="noopener noreferrer">Browse collection →</a></div>
+      <p class="hero-text" style="margin-top:0">Public-domain historical illustrated books hosted by Smithsonian Libraries and Archives. MangaVerse opens the official reader/download source.</p>
       <div class="free-pdf-grid">
-        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 2</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav2kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 4</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav4kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 5</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav5katsa" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 9</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav9kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 1</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov1kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 2</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov2katsa" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 3</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov3kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 4</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov4katsa" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 5</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov5kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 6</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov6katsa" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 7</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov7kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 8</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov8katsa" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 9</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov9kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 10</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov10kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 11</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov11katsa" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 12</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov12kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 13</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov13katsa" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 14</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov14kats" target="_blank" rel="noopener">Open PDF / Reader →</a></article>
+        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 2</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav2kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
+        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 4</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav4kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
+        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 5</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav5katsa" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
+        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 9</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav9kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
+        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 1</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov1kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
+        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 2</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov2katsa" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
       </div>
-      <div class="manifesto-card" style="margin-top:18px"><p class="eyebrow">WHY THESE LINKS?</p><h2>Official sources.<br><em>No pirate mirrors.</em></h2><p>Smithsonian marks these historical Hokusai works as public domain/CC0 and provides the online reader plus PDF download. MangaVerse links to the original host rather than re-uploading the files.</p></div>
     </section>
 
-    <section class="section manifesto"><div class="manifesto-card"><span class="panel-number">01</span><p class="eyebrow">MANGAVERSE</p><h2><span id="catalogCount">10,000+</span> stories.<br><em>One universe.</em></h2><p>The catalogue is live and paginated: MangaVerse loads manga metadata and covers on demand instead of shipping thousands of records with the website.</p></div></section>
+    <section class="section manifesto"><div class="manifesto-card"><span class="panel-number">01</span><p class="eyebrow">MANGAVERSE</p><h2><span id="catalogCount">10,000+</span> stories.<br><em>One universe.</em></h2><p>The catalogue is loaded page-by-page from metadata APIs, with dedicated sections, search, pagination and external source links.</p></div></section>
   </main>
 
   <footer><span>© MangaVerse</span><span>Like what you see? <strong>Made by HARSH</strong></span></footer>
-
   <nav class="bottom-nav" aria-label="Mobile navigation"><a class="active" href="#home">⌂<span>Home</span></a><a href="#explore">◈<span>Explore</span></a><button id="bottomSearch">⌕<span>Search</span></button><a href="#trending">✦<span>Trending</span></a><a href="#freeReads">◉<span>Free Reads</span></a></nav>
 
-  <dialog id="searchDialog"><div class="dialog-inner"><button class="close-btn" id="closeSearch">×</button><p class="eyebrow">SEARCH THE VERSE</p><h2>What are you<br><em>looking for?</em></h2><form id="searchForm"><input id="searchInput" autocomplete="off" placeholder="Title, author, manga..." /><button class="primary-btn">Search →</button></form><div class="filter-row"><button class="filter active" data-genre="" data-tag="">All</button><button class="filter" data-genre="Action">Action</button><button class="filter" data-genre="Fantasy">Fantasy</button><button class="filter" data-genre="" data-tag="Shounen">Shōnen</button><button class="filter" data-genre="" data-tag="Seinen">Seinen</button><button class="filter" data-genre="Romance">Romance</button></div><div id="searchResults" class="search-results"></div></div></dialog>
-
+  <dialog id="searchDialog"><div class="dialog-inner"><button class="close-btn" id="closeSearch">×</button><p class="eyebrow">SEARCH THE VERSE</p><h2>Find a<br><em>story.</em></h2><form id="searchForm"><input id="searchInput" autocomplete="off" placeholder="Title, author, manga..." /><button class="primary-btn">Search →</button></form><div class="filter-row"><button class="filter active" data-genre="" data-tag="">All</button><button class="filter" data-genre="Action">Action</button><button class="filter" data-genre="Fantasy">Fantasy</button><button class="filter" data-genre="Romance">Romance</button><button class="filter" data-tag="Shounen">Shōnen</button><button class="filter" data-tag="Seinen">Seinen</button></div><div class="sort-row"><label for="sortSelect">Sort</label><select id="sortSelect"><option value="POPULARITY_DESC">Most popular</option><option value="START_DATE_DESC">Newest</option></select></div><div id="searchResults" class="search-results"></div></div></dialog>
   <dialog id="detailDialog"><div class="detail-inner"><button class="close-btn" id="closeDetail">×</button><div id="detailContent"></div></div></dialog>
   <script src="app.js"></script>
-  <script>
-    // Keep the mature/public-domain collection with the manga discovery sections,
-    // rather than letting the dynamically-created section fall to the page footer.
-    const placeMatureSection = () => {
-      const mature = document.getElementById('matureClassics');
-      if (!mature) return false;
-      const seinen = [...document.querySelectorAll('main > .section')].find(s => s.querySelector('h2')?.textContent.trim() === 'Seinen');
-      if (!seinen) return false;
-      if (mature.previousElementSibling !== seinen) seinen.insertAdjacentElement('afterend', mature);
-      return true;
-    };
-    const matureWatcher = new MutationObserver(() => {
-      if (placeMatureSection()) matureWatcher.disconnect();
-    });
-    matureWatcher.observe(document.querySelector('main'), {childList:true, subtree:true});
-    placeMatureSection();
-  </script>
 </body>
 </html>
