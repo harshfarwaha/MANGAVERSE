@@ -70,6 +70,29 @@ function card(m,index=''){const image=m.coverImage?.extraLarge||m.coverImage?.la
 function renderRail(id,media){document.getElementById(id).innerHTML=media.map((m,i)=>card(m,i+1)).join('')}
 function bindCards(root=document){root.querySelectorAll('.card').forEach(el=>{el.onclick=()=>openDetail(Number(el.dataset.id),el.dataset.source);el.onkeydown=e=>{if(e.key==='Enter')openDetail(Number(el.dataset.id),el.dataset.source)}})}
 
+function addMatureClassics(){
+  if(document.getElementById('matureClassics')) return;
+  const source='https://ftp.digitalcomicmuseum.com/index.php?ACT=dogenresearch&terms=24';
+  const items=[
+    ['3-D Love','Small Publishers','Romance classic','Browse DCM →'],
+    ['Adventures in Romance #001','St. John Publications','Romance classic','Browse DCM →'],
+    ['All For Love — Vol. 1 #01','Prize Comics Group','Romance classic','Browse DCM →'],
+    ['All Romances #01','Ace Magazines','Romance classic','Browse DCM →'],
+    ['All True Romance #002','Comic Media','Romance classic','Browse DCM →'],
+    ['Best Romance #005','Better/Nedor/Standard/Pines','Romance classic','Browse DCM →'],
+    ['Phantom Lady #018','Fox Feature Syndicate','Mature-era superhero / crime','Open issue →']
+  ];
+  const cards=items.map(([title,publisher,genre,label],i)=>{
+    const href=title.startsWith('Phantom Lady')?'https://ftp.digitalcomicmuseum.com/index.php?dlid=12453':source;
+    return `<article class="pdf-card mature-card"><span>18+ · PUBLIC DOMAIN</span><h3>${escapeHTML(title)}</h3><p>${escapeHTML(publisher)} · ${escapeHTML(genre)}</p><a class="primary-btn" href="${href}" target="_blank" rel="noopener noreferrer">${label}</a></article>`;
+  }).join('');
+  const section=document.createElement('section');
+  section.className='section';section.id='matureClassics';
+  section.innerHTML=`<div class="section-head"><div><p class="eyebrow">MATURE CLASSICS · LEGAL ARCHIVE</p><h2>Adult Classics</h2></div><a class="see-all" href="${source}" target="_blank" rel="noopener">Browse archive →</a></div><p class="hero-text" style="margin-top:0">A small collection of mature-era romance, crime and pulp comics from the Digital Comic Museum. The archive says its Golden Age comics have been researched for public-domain status.</p><div class="free-pdf-grid">${cards}</div><div class="manifesto-card" style="margin-top:18px"><p class="eyebrow">READ RESPONSIBLY</p><h2>Historical comics.<br><em>18+ section.</em></h2><p>MangaVerse links to the archive instead of re-uploading files. Availability and access requirements are controlled by the original source.</p></div>`;
+  const manifesto=document.querySelector('.manifesto');
+  (manifesto?.parentNode||document.querySelector('main')).insertBefore(section,manifesto||null);
+}
+
 async function loadHome(){
   try{
     const [trending,shonen,seinen,newManga]=await Promise.all([
@@ -83,6 +106,7 @@ async function loadHome(){
     const count=document.getElementById('catalogCount');if(count) count.textContent=`${total.toLocaleString()}+`;
     const label=document.getElementById('catalogLabel');if(label) label.textContent=`LIVE CATALOGUE · ${total.toLocaleString()}+ MANGA ENTRIES`;
   }catch(err){document.querySelectorAll('.skeleton-row').forEach(x=>x.textContent='Catalogue temporarily unavailable.');console.error(err)}
+  addMatureClassics();
 }
 
 async function openDetail(id,source='anilist'){
