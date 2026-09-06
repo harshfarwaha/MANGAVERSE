@@ -15,7 +15,7 @@
   <div class="grain" aria-hidden="true"></div>
   <header class="topbar">
     <a class="brand" href="#home" aria-label="MangaVerse home"><span class="brand-mark">MV</span><span>MANGA<span>VERSE</span></span></a>
-    <nav class="desktop-nav" aria-label="Primary"><a href="#home">Home</a><a href="#explore">Explore</a><a href="#trending">Trending</a><a href="#freeReads">Free Reads</a></nav>
+    <nav class="desktop-nav" aria-label="Primary"><a href="#home">Home</a><a href="#explore">Explore</a><a href="#readFree">Read Free</a><a href="#trending">Trending</a><a href="#myLibrary">My Library</a></nav>
     <button class="icon-btn" id="openSearch" aria-label="Search">⌕</button>
   </header>
 
@@ -33,9 +33,15 @@
     <section class="section"><div class="section-head"><div><p class="eyebrow">HEART · DRAMA · RELATIONSHIPS</p><h2>Romance</h2></div><button class="see-all" data-query="ROMANCE">See all →</button></div><div class="rail" id="romanceRail"><div class="skeleton-row"></div></div></section>
     <section class="section"><div class="section-head"><div><p class="eyebrow">FRESH PANELS</p><h2>New & Rising</h2></div><button class="see-all" data-query="NEW">See all →</button></div><div class="rail" id="newRail"><div class="skeleton-row"></div></div></section>
 
+    <section class="section" id="readFree">
+      <div class="section-head"><div><p class="eyebrow">FREE TO READ · MANGADEX</p><h2>Read Free Now</h2></div><button class="see-all" id="seeAllMangadex">See all →</button></div>
+      <p class="hero-text" style="margin-top:0">Titles freely distributed on MangaDex — independently published, creator-permitted, or officially licensed for free reading. MangaVerse links you straight to the source.</p>
+      <div class="rail" id="mangadexRail"><div class="skeleton-row"></div></div>
+    </section>
+
     <section class="section" id="freeReads">
       <div class="section-head"><div><p class="eyebrow">VERIFIED PUBLIC DOMAIN</p><h2>Free PDF Reads</h2></div><a class="see-all" href="https://library.si.edu/digital-library/collection/japanese-illustrated-books/list" target="_blank" rel="noopener noreferrer">Browse collection →</a></div>
-      <p class="hero-text" style="margin-top:0">Public-domain historical illustrated books hosted by Smithsonian Libraries and Archives. MangaVerse opens the official reader/download source.</p>
+      <p class="hero-text" style="margin-top:0">Public-domain historical illustrated books hosted by Smithsonian Libraries and Archives, the Library of Congress, and Wikimedia Commons. MangaVerse opens the official reader/download source — never a rehost.</p>
       <div class="free-pdf-grid">
         <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 2</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav2kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
         <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 4</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav4kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
@@ -43,14 +49,34 @@
         <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 9</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav9kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
         <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 1</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov1kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
         <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 2</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov2katsa" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
+        <article class="pdf-card"><span>PD · LOC</span><h3>Japanese Illustrated Books</h3><p>Library of Congress · Japanese Rare Book Collection</p><a class="primary-btn" href="https://www.loc.gov/collections/japanese-rare-books/about-this-collection/" target="_blank" rel="noopener noreferrer">Browse LOC →</a></article>
+        <article class="pdf-card"><span>PD · IA</span><h3>Hokusai Manga (Internet Archive)</h3><p>Multiple volumes · Open-access scans</p><a class="primary-btn" href="https://archive.org/details/hokusaimanga01kats" target="_blank" rel="noopener noreferrer">Open Archive →</a></article>
+        <article class="pdf-card"><span>PD · NDL</span><h3>National Diet Library</h3><p>Japanese digital collections · copyright-expired works</p><a class="primary-btn" href="https://www.ndl.go.jp/en/dlib/" target="_blank" rel="noopener noreferrer">Open NDL →</a></article>
+        <article class="pdf-card"><span>PD · COMMONS</span><h3>Wikimedia Commons</h3><p>Public-domain Japanese illustration scans</p><a class="primary-btn" href="https://commons.wikimedia.org/wiki/Category:Hokusai" target="_blank" rel="noopener noreferrer">Browse Commons →</a></article>
+        <article class="pdf-card"><span>PD · WASEDA</span><h3>Waseda University Library</h3><p>Hokusai holdings · open-access digital scans</p><a class="primary-btn" href="https://www.wul.waseda.ac.jp/kotenseki/search.php?k=on&t=%E5%8D%97%E8%82%B2" target="_blank" rel="noopener noreferrer">Open Waseda →</a></article>
+        <article class="pdf-card"><span>PD · COMMONS</span><h3>Ryūsai Manga</h3><p>Keisai Eisen · Edo period illustrated book</p><a class="primary-btn" href="https://commons.wikimedia.org/wiki/Category:Keisai_Eisen" target="_blank" rel="noopener noreferrer">Open Commons →</a></article>
       </div>
+      <p class="source-note" style="margin-top:14px;font-size:11px;color:var(--muted)">All links open the original host. Each work has been verified as public domain or openly licensed by the holding institution. MangaVerse does not mirror or alter these scans.</p>
+    </section>
+
+    <section class="section" id="myLibrary">
+      <div class="section-head"><div><p class="eyebrow">YOUR PERSONAL TRACKER · LOCAL ONLY</p><h2>My Library</h2></div><button class="see-all" id="clearLibrary" style="color:#aaa7b0">Clear →</button></div>
+      <p class="hero-text" style="margin-top:0">Bookmark manga, mark favorites, and track what you're reading. Everything is saved in your browser — nothing leaves your device.</p>
+      <div class="filter-row" style="padding:0 0 14px">
+        <button class="filter active" data-lib="all">All</button>
+        <button class="filter" data-lib="favorites">★ Favorites</button>
+        <button class="filter" data-lib="reading">Reading</button>
+        <button class="filter" data-lib="plan">Plan to Read</button>
+        <button class="filter" data-lib="finished">Finished</button>
+      </div>
+      <div id="libraryGrid" class="search-results"></div>
     </section>
 
     <section class="section manifesto"><div class="manifesto-card"><span class="panel-number">01</span><p class="eyebrow">MANGAVERSE</p><h2><span id="catalogCount">10,000+</span> stories.<br><em>One universe.</em></h2><p>The catalogue is loaded page-by-page from metadata APIs, with dedicated sections, search, pagination and external source links.</p></div></section>
   </main>
 
   <footer><span>© MangaVerse</span><span>Like what you see? <strong>Made by HARSH</strong></span></footer>
-  <nav class="bottom-nav" aria-label="Mobile navigation"><a class="active" href="#home">⌂<span>Home</span></a><a href="#explore">◈<span>Explore</span></a><button id="bottomSearch">⌕<span>Search</span></button><a href="#trending">✦<span>Trending</span></a><a href="#freeReads">◉<span>Free Reads</span></a></nav>
+  <nav class="bottom-nav" aria-label="Mobile navigation"><a class="active" href="#home">⌂<span>Home</span></a><a href="#explore">◈<span>Explore</span></a><button id="bottomSearch">⌕<span>Search</span></button><a href="#readFree">⚡<span>Free</span></a><a href="#myLibrary">★<span>Library</span></a></nav>
 
   <dialog id="searchDialog"><div class="dialog-inner"><button class="close-btn" id="closeSearch">×</button><p class="eyebrow">SEARCH THE VERSE</p><h2>Find a<br><em>story.</em></h2><form id="searchForm"><input id="searchInput" autocomplete="off" placeholder="Title, author, manga..." /><button class="primary-btn">Search →</button></form><div class="filter-row"><button class="filter active" data-genre="" data-tag="">All</button><button class="filter" data-genre="Action">Action</button><button class="filter" data-genre="Fantasy">Fantasy</button><button class="filter" data-genre="Romance">Romance</button><button class="filter" data-tag="Shounen">Shōnen</button><button class="filter" data-tag="Seinen">Seinen</button></div><div class="sort-row"><label for="sortSelect">Sort</label><select id="sortSelect"><option value="POPULARITY_DESC">Most popular</option><option value="START_DATE_DESC">Newest</option></select></div><div id="searchResults" class="search-results"></div></div></dialog>
   <dialog id="detailDialog"><div class="detail-inner"><button class="close-btn" id="closeDetail">×</button><div id="detailContent"></div></div></dialog>
