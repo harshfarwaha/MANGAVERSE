@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#09090d" />
+  <title>MangaVerse Reader — Free Manga Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root { --reader-bg: #08080a; --reader-bar: #121217cc; }
+    body.reader-body { background: var(--reader-bg); margin:0; color:#fff; overflow-x:hidden; }
+    .reader-topbar { position:fixed; top:0; left:0; right:0; height:64px; background: var(--reader-bar); backdrop-filter: blur(20px); border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; padding:0 18px; z-index:50; }
+    .reader-topbar .left { display:flex; align-items:center; gap:14px; }
+    .reader-topbar a { color:#fff; text-decoration:none; font-weight:800; font-size:13px; }
+    .reader-title { font-family:Rajdhani; font-weight:700; font-size:18px; letter-spacing:.02em; max-width:40vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .reader-chapter { font-size:11px; color:#aaa7b0; letter-spacing:.12em; font-weight:700; }
+    .reader-controls { display:flex; align-items:center; gap:10px; }
+    .reader-btn { border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.08); color:#fff; padding:8px 14px; border-radius:999px; font-weight:700; font-size:12px; cursor:pointer; transition:.2s; }
+    .reader-btn:hover { background:#fff; color:#09090d; }
+    .reader-btn.primary { background:#ff3b30; border-color:#ff3b30; }
+    .reader-btn.primary:hover { background:#ff5248; }
+    .reader-btn:disabled { opacity:.4; cursor:not-allowed; }
+    .reader-container { padding-top:64px; min-height:100vh; }
+    .reader-pages { max-width:800px; margin:0 auto; padding:20px 0 120px; }
+    .reader-page { margin:0 auto 8px; background:#111117; border-radius:8px; overflow:hidden; min-height:400px; display:grid; place-items:center; position:relative; }
+    .reader-page img { width:100%; height:auto; display:block; max-width:100%; }
+    .reader-page .page-num { position:absolute; bottom:10px; right:12px; background:rgba(0,0,0,.7); color:#fff; font:700 10px Rajdhani; padding:4px 8px; border-radius:6px; }
+    .reader-page.loading { background:linear-gradient(90deg,#111117 20%,#1a1a22 35%,#111117 50%); background-size:200% 100%; animation:shimmer 1.4s infinite; }
+    @keyframes shimmer { to { background-position:-200% 0; } }
+    .reader-bottombar { position:fixed; bottom:0; left:0; right:0; background:var(--reader-bar); backdrop-filter:blur(20px); border-top:1px solid rgba(255,255,255,.08); padding:14px 18px calc(14px + env(safe-area-inset-bottom)); display:flex; align-items:center; justify-content:space-between; z-index:50; }
+    .reader-progress { flex:1; max-width:400px; margin:0 20px; }
+    .progress-bar { height:4px; background:rgba(255,255,255,.1); border-radius:999px; overflow:hidden; }
+    .progress-fill { height:100%; background:#ff3b30; transition:width .3s; }
+    .progress-text { font:700 10px Rajdhani; letter-spacing:.12em; color:#aaa7b0; margin-top:6px; display:flex; justify-content:space-between; }
+    .reader-settings { position:fixed; top:70px; right:18px; background:#18181f; border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:16px; width:280px; z-index:60; box-shadow:0 20px 60px rgba(0,0,0,.5); display:none; }
+    .reader-settings.open { display:block; }
+    .setting-row { display:flex; justify-content:space-between; align-items:center; margin:10px 0; }
+    .setting-row label { font-size:12px; font-weight:700; color:#aaa7b0; }
+    .toggle { width:44px; height:26px; background:#27272a; border-radius:999px; position:relative; cursor:pointer; transition:.2s; }
+    .toggle.on { background:#ff3b30; }
+    .toggle:after { content:''; position:absolute; width:20px; height:20px; background:#fff; border-radius:50%; top:3px; left:3px; transition:.2s; }
+    .toggle.on:after { left:21px; }
+    .chapter-list-drawer { position:fixed; top:0; right:0; bottom:0; width:360px; max-width:90vw; background:#0d0d12; border-left:1px solid rgba(255,255,255,.08); z-index:70; transform:translateX(100%); transition:transform .35s cubic-bezier(.4,0,.2,1); overflow-y:auto; }
+    .chapter-list-drawer.open { transform:translateX(0); }
+    .drawer-head { position:sticky; top:0; background:#0d0d12; padding:20px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; justify-content:space-between; align-items:center; }
+    .drawer-head h3 { font:800 22px Rajdhani; margin:0; text-transform:uppercase; }
+    .chap-item { padding:14px 20px; border-bottom:1px solid rgba(255,255,255,.06); cursor:pointer; transition:.2s; display:flex; justify-content:space-between; align-items:center; }
+    .chap-item:hover { background:rgba(255,255,255,.04); }
+    .chap-item.active { background:rgba(255,59,48,.12); border-left:3px solid #ff3b30; }
+    .chap-item .c-title { font-weight:700; font-size:13px; }
+    .chap-item .c-meta { font-size:11px; color:#aaa7b0; margin-top:2px; }
+    .overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); z-index:55; display:none; }
+    .overlay.open { display:block; }
+    .reader-empty { max-width:600px; margin:120px auto; text-align:center; padding:40px 20px; }
+    .reader-empty h2 { font:800 48px Rajdhani; margin:0 0 12px; line-height:.9; text-transform:uppercase; }
+    .reader-empty p { color:#aaa7b0; line-height:1.6; }
+    .mode-controls { display:flex; gap:8px; margin-top:12px; }
+    .mode-btn { flex:1; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.1); background:#111117; color:#fff; font-weight:700; font-size:12px; cursor:pointer; }
+    .mode-btn.active { background:#fff; color:#09090d; }
+    @media(max-width:720px){
+      .reader-title { max-width:30vw; font-size:14px; }
+      .reader-topbar { height:56px; padding:0 12px; }
+      .reader-container { padding-top:56px; }
+      .reader-pages { padding:8px 0 100px; }
+      .reader-page { border-radius:0; margin-bottom:2px; }
+      .chapter-list-drawer { width:100vw; max-width:100vw; }
+    }
+  </style>
+</head>
+<body class="reader-body">
+  <header class="reader-topbar">
+    <div class="left">
+      <a href="index.html" class="reader-btn">← Back</a>
+      <div>
+        <div class="reader-title" id="readerTitle">Loading...</div>
+        <div class="reader-chapter" id="readerChapter">FREE MANGA READER · MANGADEX</div>
+      </div>
+    </div>
+    <div class="reader-controls">
+      <button class="reader-btn" id="prevChap" disabled>← Prev</button>
+      <button class="reader-btn" id="chapterListBtn">Chapters</button>
+      <button class="reader-btn" id="settingsBtn">⚙</button>
+      <button class="reader-btn primary" id="nextChap" disabled>Next →</button>
+    </div>
+  </header>
+
+  <div class="reader-settings" id="readerSettings">
+    <h4 style="margin:0 0 14px;font:800 14px Rajdhani;letter-spacing:.1em;">READER SETTINGS</h4>
+    <div class="setting-row"><label>Single Page Mode</label><div class="toggle on" id="toggleSingle" data-setting="singlePage"></div></div>
+    <div class="setting-row"><label>Fit Width</label><div class="toggle on" id="toggleFit" data-setting="fitWidth"></div></div>
+    <div class="setting-row"><label>Show Page Numbers</label><div class="toggle on" id="toggleNumbers" data-setting="showNumbers"></div></div>
+    <div class="setting-row"><label>Dark Background</label><div class="toggle on" id="toggleDark" data-setting="darkBg"></div></div>
+    <div class="mode-controls">
+      <button class="mode-btn active" data-mode="vertical">Vertical</button>
+      <button class="mode-btn" data-mode="horizontal">Horizontal</button>
+    </div>
+    <p style="font-size:10px;color:#71717a;margin-top:14px;line-height:1.5;">Images are loaded directly from MangaDex CDN via their official at-home API. MangaVerse does not host or mirror images.</p>
+  </div>
+
+  <div class="chapter-list-drawer" id="chapterDrawer">
+    <div class="drawer-head">
+      <h3>Chapters</h3>
+      <button class="reader-btn" id="closeDrawer">×</button>
+    </div>
+    <div id="drawerChapters"><div style="padding:40px 20px;text-align:center;color:#71717a;">Loading chapters...</div></div>
+  </div>
+  <div class="overlay" id="overlay"></div>
+
+  <main class="reader-container">
+    <div class="reader-pages" id="readerPages">
+      <div class="reader-empty" id="loadingState">
+        <p class="eyebrow">MANGAVERSE READER · LEGAL FREE MANGA</p>
+        <h2>Loading<br><em style="color:#ff3b30;font-style:normal;">your manga.</em></h2>
+        <p>Fetching chapter data from MangaDex official API. This may take a moment.</p>
+        <div class="skeleton-row" style="height:400px;margin-top:20px;"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="reader-bottombar">
+    <div style="display:flex;gap:10px;">
+      <button class="reader-btn" id="bottomPrev" disabled>← Previous</button>
+      <button class="reader-btn" id="bottomNext" disabled>Next Chapter →</button>
+    </div>
+    <div class="reader-progress">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-text"><span id="progressCurrent">Page 0 / 0</span><span id="progressPercent">0%</span></div>
+    </div>
+    <div style="font-size:10px;color:#71717a;letter-spacing:.08em;">MANGADEX · FREE</div>
+  </footer>
+
+  <script src="free-manga.js"></script>
+  <script src="upload.js"></script>
+  <script src="reader.js"></script>
+</body>
+</html>

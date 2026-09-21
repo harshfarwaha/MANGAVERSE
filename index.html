@@ -4,82 +4,296 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#09090d" />
-  <meta name="description" content="MangaVerse — discover Shōnen, Seinen, action, fantasy, romance and public-domain manga." />
-  <title>MangaVerse — Beyond the Panel</title>
+  <meta name="description" content="MangaVerse — All free manga available online. 20,000+ free manga from MangaDex, public domain, official free sources, plus upload your own." />
+  <title>MangaVerse — All Free Manga, One Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
+  
   <header class="topbar">
     <a class="brand" href="#home" aria-label="MangaVerse home"><span class="brand-mark">MV</span><span>MANGA<span>VERSE</span></span></a>
-    <nav class="desktop-nav" aria-label="Primary"><a href="#home">Home</a><a href="#explore">Explore</a><a href="#readFree">Read Free</a><a href="#trending">Trending</a><a href="#myLibrary">My Library</a></nav>
-    <button class="icon-btn" id="openSearch" aria-label="Search">⌕</button>
+    <nav class="desktop-nav" aria-label="Primary">
+      <a href="#home">Home</a>
+      <a href="#freeAll">Free Manga</a>
+      <a href="#readFree">MangaDex</a>
+      <a href="#officialFree">Official</a>
+      <a href="#myUploads">My Uploads</a>
+      <a href="#myLibrary">Library</a>
+    </nav>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="ghost-btn" id="openUpload" style="padding:8px 14px;font-size:12px;">+ Upload</button>
+      <button class="icon-btn" id="openSearch" aria-label="Search">⌕</button>
+    </div>
   </header>
 
   <main id="home">
+    <!-- HERO - ALL FREE MANGA -->
     <section class="hero" aria-labelledby="heroTitle">
-      <div class="hero-copy"><p class="eyebrow" id="catalogLabel">LIVE CATALOGUE · LOADING MANGA</p><h1 id="heroTitle">Find your<br><em>next story.</em></h1><p class="hero-text">A large live manga catalogue, arranged by story type, genre and popularity — built for mobile reading and discovery.</p><div class="hero-actions"><button class="primary-btn" id="exploreBtn">Explore Manga <span>→</span></button><button class="ghost-btn" id="heroSearch">Search</button></div></div>
-      <div class="hero-art" aria-hidden="true"><div class="panel p1"></div><div class="panel p2"></div><div class="panel p3"></div><div class="speed-lines"></div><span class="hero-word">MANGA</span></div>
+      <div class="hero-copy">
+        <p class="eyebrow" id="catalogLabel">FREE MANGA AGGREGATOR · 20,000+ TITLES</p>
+        <h1 id="heroTitle">All free<br><em>manga.</em><br>One verse.</h1>
+        <p class="hero-text">Every legally free manga available online — MangaDex creator uploads, public domain masterpieces, official free chapters from Shueisha & VIZ, plus your own original uploads. No piracy, no paywalls bypassed.</p>
+        <div class="hero-actions">
+          <button class="primary-btn" id="exploreBtn">Browse Free Manga <span>→</span></button>
+          <button class="ghost-btn" id="heroSearch">Search All Free</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><span id="statMangadex">20k+</span><label>MangaDex Free</label></div>
+          <div class="stat"><span>37+</span><label>Public Domain</label></div>
+          <div class="stat"><span>7</span><label>Official Sources</label></div>
+          <div class="stat"><span id="statUploads">0</span><label>Your Uploads</label></div>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="panel p1"></div>
+        <div class="panel p2"></div>
+        <div class="panel p3"></div>
+        <div class="speed-lines"></div>
+        <span class="hero-word">FREE</span>
+      </div>
     </section>
 
-    <section class="section" id="trending"><div class="section-head"><div><p class="eyebrow">RIGHT NOW</p><h2>Trending</h2></div><button class="see-all" data-query="TRENDING">See all →</button></div><div class="rail" id="trendingRail"><div class="skeleton-row"></div></div></section>
-    <section class="section" id="explore"><div class="section-head"><div><p class="eyebrow">BATTLE · FRIENDSHIP · GROWTH</p><h2>Shōnen</h2></div><button class="see-all" data-query="SHONEN">See all →</button></div><div class="rail" id="shonenRail"><div class="skeleton-row"></div></div></section>
-    <section class="section"><div class="section-head"><div><p class="eyebrow">DARKER · MATURE · COMPLEX</p><h2>Seinen</h2></div><button class="see-all" data-query="SEINEN">See all →</button></div><div class="rail" id="seinenRail"><div class="skeleton-row"></div></div></section>
-    <section class="section"><div class="section-head"><div><p class="eyebrow">HIGH ENERGY</p><h2>Action</h2></div><button class="see-all" data-query="ACTION">See all →</button></div><div class="rail" id="actionRail"><div class="skeleton-row"></div></div></section>
-    <section class="section"><div class="section-head"><div><p class="eyebrow">WORLDS BEYOND REALITY</p><h2>Fantasy</h2></div><button class="see-all" data-query="FANTASY">See all →</button></div><div class="rail" id="fantasyRail"><div class="skeleton-row"></div></div></section>
-    <section class="section"><div class="section-head"><div><p class="eyebrow">HEART · DRAMA · RELATIONSHIPS</p><h2>Romance</h2></div><button class="see-all" data-query="ROMANCE">See all →</button></div><div class="rail" id="romanceRail"><div class="skeleton-row"></div></div></section>
-    <section class="section"><div class="section-head"><div><p class="eyebrow">FRESH PANELS</p><h2>New & Rising</h2></div><button class="see-all" data-query="NEW">See all →</button></div><div class="rail" id="newRail"><div class="skeleton-row"></div></div></section>
+    <!-- FREE MANGA CATEGORIES -->
+    <section class="section" id="freeAll">
+      <div class="section-head">
+        <div><p class="eyebrow">ALL FREE MANGA · LIVE FROM MANGADEX + MORE</p><h2>Browse Free Universe</h2></div>
+        <div style="display:flex;gap:8px;">
+          <select id="freeSort" class="filter" style="background:#111117;color:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:999px;">
+            <option value="followedCount">Most Popular</option>
+            <option value="latestUploadedChapter">Latest Updates</option>
+            <option value="createdAt">Newest Added</option>
+            <option value="relevance">Relevance</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="filter-row" id="freeFilters">
+        <button class="filter active" data-free="all">All Free</button>
+        <button class="filter" data-free="trending">🔥 Trending Free</button>
+        <button class="filter" data-free="latest">⚡ Latest Updates</button>
+        <button class="filter" data-free="new">✨ New on MangaDex</button>
+        <button class="filter" data-free="action">Action</button>
+        <button class="filter" data-free="fantasy">Fantasy</button>
+        <button class="filter" data-free="romance">Romance</button>
+        <button class="filter" data-free="comedy">Comedy</button>
+        <button class="filter" data-free="drama">Drama</button>
+        <button class="filter" data-free="horror">Horror</button>
+      </div>
 
+      <div class="rail" id="freeAllRail"><div class="skeleton-row"></div></div>
+      <div style="display:flex;justify-content:center;gap:12px;margin-top:18px;">
+        <button class="ghost-btn" id="loadMoreFree">Load More Free Manga →</button>
+        <span id="freeTotal" style="color:var(--muted);font-size:12px;padding:12px;">Loading total...</span>
+      </div>
+    </section>
+
+    <!-- MANGADEX FREE - ALL AVAILABLE -->
     <section class="section" id="readFree">
-      <div class="section-head"><div><p class="eyebrow">FREE TO READ · MANGADEX</p><h2>Read Free Now</h2></div><button class="see-all" id="seeAllMangadex">See all →</button></div>
-      <p class="hero-text" style="margin-top:0">Titles freely distributed on MangaDex — independently published, creator-permitted, or officially licensed for free reading. MangaVerse links you straight to the source.</p>
+      <div class="section-head">
+        <div><p class="eyebrow">FREE TO READ · MANGADEX PUBLIC API · 20,000+ TITLES</p><h2>Read Free Now — MangaDex</h2></div>
+        <button class="see-all" id="seeAllMangadex">See all 20k+ →</button>
+      </div>
+      <p class="hero-text" style="margin-top:0">All manga with available English chapters on MangaDex — independently published, creator-permitted, official translations. Every chapter opens in our built-in reader powered by MangaDex at-home CDN. No rehosting.</p>
       <div class="rail" id="mangadexRail"><div class="skeleton-row"></div></div>
     </section>
 
-    <section class="section" id="freeReads">
-      <div class="section-head"><div><p class="eyebrow">VERIFIED PUBLIC DOMAIN</p><h2>Free PDF Reads</h2></div><a class="see-all" href="https://library.si.edu/digital-library/collection/japanese-illustrated-books/list" target="_blank" rel="noopener noreferrer">Browse collection →</a></div>
-      <p class="hero-text" style="margin-top:0">Public-domain historical illustrated books hosted by Smithsonian Libraries and Archives, the Library of Congress, and Wikimedia Commons. MangaVerse opens the official reader/download source — never a rehost.</p>
-      <div class="free-pdf-grid">
-        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 2</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav2kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 4</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav4kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 5</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav5katsa" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 9</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav9kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 1</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov1kats" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
-        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu Hokusai Manga — Vol. 2</h3><p>Katsushika Hokusai · Japanese illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov2katsa" target="_blank" rel="noopener noreferrer">Open Reader →</a></article>
-        <article class="pdf-card"><span>PD · LOC</span><h3>Japanese Illustrated Books</h3><p>Library of Congress · Japanese Rare Book Collection</p><a class="primary-btn" href="https://www.loc.gov/collections/japanese-rare-books/about-this-collection/" target="_blank" rel="noopener noreferrer">Browse LOC →</a></article>
-        <article class="pdf-card"><span>PD · IA</span><h3>Hokusai Manga (Internet Archive)</h3><p>Multiple volumes · Open-access scans</p><a class="primary-btn" href="https://archive.org/details/hokusaimanga01kats" target="_blank" rel="noopener noreferrer">Open Archive →</a></article>
-        <article class="pdf-card"><span>PD · NDL</span><h3>National Diet Library</h3><p>Japanese digital collections · copyright-expired works</p><a class="primary-btn" href="https://www.ndl.go.jp/en/dlib/" target="_blank" rel="noopener noreferrer">Open NDL →</a></article>
-        <article class="pdf-card"><span>PD · COMMONS</span><h3>Wikimedia Commons</h3><p>Public-domain Japanese illustration scans</p><a class="primary-btn" href="https://commons.wikimedia.org/wiki/Category:Hokusai" target="_blank" rel="noopener noreferrer">Browse Commons →</a></article>
-        <article class="pdf-card"><span>PD · WASEDA</span><h3>Waseda University Library</h3><p>Hokusai holdings · open-access digital scans</p><a class="primary-btn" href="https://www.wul.waseda.ac.jp/kotenseki/search.php?k=on&t=%E5%8D%97%E8%82%B2" target="_blank" rel="noopener noreferrer">Open Waseda →</a></article>
-        <article class="pdf-card"><span>PD · COMMONS</span><h3>Ryūsai Manga</h3><p>Keisai Eisen · Edo period illustrated book</p><a class="primary-btn" href="https://commons.wikimedia.org/wiki/Category:Keisai_Eisen" target="_blank" rel="noopener noreferrer">Open Commons →</a></article>
+    <!-- OFFICIAL FREE SOURCES -->
+    <section class="section" id="officialFree">
+      <div class="section-head">
+        <div><p class="eyebrow">OFFICIAL PUBLISHER FREE CHAPTERS · LEGAL</p><h2>Official Free Sources</h2></div>
+        <a class="see-all" href="https://mangaplus.shueisha.co.jp/" target="_blank" rel="noopener">Browse MangaPlus →</a>
       </div>
-      <p class="source-note" style="margin-top:14px;font-size:11px;color:var(--muted)">All links open the original host. Each work has been verified as public domain or openly licensed by the holding institution. MangaVerse does not mirror or alter these scans.</p>
+      <p class="hero-text" style="margin-top:0">Publishers offering free chapters legally. First 3 and latest 3 chapters free on MangaPlus, free previews on VIZ, thousands of free webtoons, and more.</p>
+      <div class="free-pdf-grid" id="officialGrid"></div>
     </section>
 
+    <!-- MY UPLOADS - USER ORIGINAL MANGA -->
+    <section class="section" id="myUploads">
+      <div class="section-head">
+        <div><p class="eyebrow">YOUR ORIGINAL MANGA · UPLOAD & PUBLISH</p><h2>My Uploads</h2></div>
+        <button class="see-all" id="openUpload2">+ Upload New Manga →</button>
+      </div>
+      <p class="hero-text" style="margin-top:0">Upload your own original manga creations. Stored locally in your browser via IndexedDB. Add chapters as image sequences. Export/import anytime. This is how you publish free manga on MangaVerse — your creations, your rights.</p>
+      
+      <div class="upload-zone" id="uploadZone">
+        <div class="upload-icon">⬆</div>
+        <h3>Drop manga pages here or click to upload</h3>
+        <p>Support: JPG, PNG, WEBP. Create a new manga or add chapters to existing.</p>
+        <button class="primary-btn" id="uploadBtn">Choose Files →</button>
+        <input type="file" id="fileInput" accept="image/*" multiple hidden />
+        <p style="font-size:10px;color:var(--muted);margin-top:12px;">Only upload original works you own. No copyrighted material.</p>
+      </div>
+
+      <div id="uploadsGrid" class="search-results" style="margin-top:20px;"></div>
+    </section>
+
+    <!-- DISCOVERY SECTIONS - METADATA CATALOG -->
+    <section class="section" id="trending"><div class="section-head"><div><p class="eyebrow">RIGHT NOW · METADATA CATALOG</p><h2>Trending Discovery</h2></div><button class="see-all" data-query="TRENDING">See all →</button></div><div class="rail" id="trendingRail"><div class="skeleton-row"></div></div></section>
+    <section class="section" id="explore"><div class="section-head"><div><p class="eyebrow">BATTLE · FRIENDSHIP · GROWTH</p><h2>Shōnen Discovery</h2></div><button class="see-all" data-query="SHONEN">See all →</button></div><div class="rail" id="shonenRail"><div class="skeleton-row"></div></div></section>
+    <section class="section"><div class="section-head"><div><p class="eyebrow">DARKER · MATURE · COMPLEX</p><h2>Seinen Discovery</h2></div><button class="see-all" data-query="SEINEN">See all →</button></div><div class="rail" id="seinenRail"><div class="skeleton-row"></div></div></section>
+    <section class="section"><div class="section-head"><div><p class="eyebrow">HIGH ENERGY</p><h2>Action Discovery</h2></div><button class="see-all" data-query="ACTION">See all →</button></div><div class="rail" id="actionRail"><div class="skeleton-row"></div></div></section>
+    <section class="section"><div class="section-head"><div><p class="eyebrow">WORLDS BEYOND REALITY</p><h2>Fantasy Discovery</h2></div><button class="see-all" data-query="FANTASY">See all →</button></div><div class="rail" id="fantasyRail"><div class="skeleton-row"></div></div></section>
+    <section class="section"><div class="section-head"><div><p class="eyebrow">HEART · DRAMA · RELATIONSHIPS</p><h2>Romance Discovery</h2></div><button class="see-all" data-query="ROMANCE">See all →</button></div><div class="rail" id="romanceRail"><div class="skeleton-row"></div></div></section>
+
+    <!-- PUBLIC DOMAIN -->
+    <section class="section" id="freeReads">
+      <div class="section-head"><div><p class="eyebrow">VERIFIED PUBLIC DOMAIN · 37+ VOLUMES</p><h2>Free PDF Reads — History</h2></div><a class="see-all" href="public-domain.html">Browse all 37+ →</a></div>
+      <p class="hero-text" style="margin-top:0">Public-domain historical illustrated books hosted by Smithsonian, Library of Congress, Wikimedia. Links open original host — never rehosted.</p>
+      <div class="free-pdf-grid">
+        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 2</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav2kats" target="_blank" rel="noopener">Open Reader →</a></article>
+        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 4</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav4kats" target="_blank" rel="noopener">Open Reader →</a></article>
+        <article class="pdf-card"><span>PD · CC0</span><h3>Hokusai Manga — Volume 5</h3><p>Katsushika Hokusai · Edo period</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/hokusaimangav5katsa" target="_blank" rel="noopener">Open Reader →</a></article>
+        <article class="pdf-card"><span>PD · CC0</span><h3>Denshin Kaishu — Vol. 1</h3><p>Katsushika Hokusai · Illustrated book</p><a class="primary-btn" href="https://library.si.edu/digital-library/book/denshinkaishuhov1kats" target="_blank" rel="noopener">Open Reader →</a></article>
+      </div>
+    </section>
+
+    <!-- MY LIBRARY -->
     <section class="section" id="myLibrary">
       <div class="section-head"><div><p class="eyebrow">YOUR PERSONAL TRACKER · LOCAL ONLY</p><h2>My Library</h2></div><button class="see-all" id="clearLibrary" style="color:#aaa7b0">Clear →</button></div>
-      <p class="hero-text" style="margin-top:0">Bookmark manga, mark favorites, and track what you're reading. Everything is saved in your browser — nothing leaves your device.</p>
+      <p class="hero-text" style="margin-top:0">Bookmark manga, mark favorites, track reading. Saved in your browser — nothing leaves your device. Includes your uploads and free manga.</p>
       <div class="filter-row" style="padding:0 0 14px">
         <button class="filter active" data-lib="all">All</button>
         <button class="filter" data-lib="favorites">★ Favorites</button>
         <button class="filter" data-lib="reading">Reading</button>
         <button class="filter" data-lib="plan">Plan to Read</button>
         <button class="filter" data-lib="finished">Finished</button>
+        <button class="filter" data-lib="uploads">My Uploads</button>
       </div>
       <div id="libraryGrid" class="search-results"></div>
     </section>
 
-    <section class="section manifesto"><div class="manifesto-card"><span class="panel-number">01</span><p class="eyebrow">MANGAVERSE</p><h2><span id="catalogCount">10,000+</span> stories.<br><em>One universe.</em></h2><p>The catalogue is loaded page-by-page from metadata APIs, with dedicated sections, search, pagination and external source links.</p></div></section>
+    <section class="section manifesto">
+      <div class="manifesto-card">
+        <span class="panel-number">01</span>
+        <p class="eyebrow">MANGAVERSE · ALL FREE MANGA</p>
+        <h2><span id="catalogCount">20,000+</span> free stories.<br><em>One universe.</em></h2>
+        <p>We aggregate every legally free manga: 20k+ titles from MangaDex public API with built-in reader, 37+ public domain volumes, 7 official publisher free sources, plus your own original uploads via IndexedDB. Metadata from AniList + Jikan for discovery. No piracy — all links go to official sources or use official CDNs.</p>
+        <div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag">MangaDex Public API</span>
+          <span class="tag">At-Home Reader</span>
+          <span class="tag">Public Domain CC0</span>
+          <span class="tag">Official Free</span>
+          <span class="tag">User Uploads</span>
+          <span class="tag">IndexedDB</span>
+          <span class="tag">100% Legal</span>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer><span>© MangaVerse</span><span>Like what you see? <strong>Made by HARSH</strong></span></footer>
-  <nav class="bottom-nav" aria-label="Mobile navigation"><a class="active" href="#home">⌂<span>Home</span></a><a href="#explore">◈<span>Explore</span></a><button id="bottomSearch">⌕<span>Search</span></button><a href="#readFree">⚡<span>Free</span></a><a href="#myLibrary">★<span>Library</span></a></nav>
+  <footer><span>© MangaVerse — All Free Manga Aggregator</span><span>Made by HARSH · 20k+ free titles · Legal only</span></footer>
+  
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    <a class="active" href="#home">⌂<span>Home</span></a>
+    <a href="#freeAll">⚡<span>Free</span></a>
+    <button id="bottomSearch">⌕<span>Search</span></button>
+    <a href="#myUploads">⬆<span>Upload</span></a>
+    <a href="#myLibrary">★<span>Library</span></a>
+  </nav>
 
-  <dialog id="searchDialog"><div class="dialog-inner"><button class="close-btn" id="closeSearch">×</button><p class="eyebrow">SEARCH THE VERSE</p><h2>Find a<br><em>story.</em></h2><form id="searchForm"><input id="searchInput" autocomplete="off" placeholder="Title, author, manga..." /><button class="primary-btn">Search →</button></form><div class="filter-row"><button class="filter active" data-genre="" data-tag="">All</button><button class="filter" data-genre="Action">Action</button><button class="filter" data-genre="Fantasy">Fantasy</button><button class="filter" data-genre="Romance">Romance</button><button class="filter" data-tag="Shounen">Shōnen</button><button class="filter" data-tag="Seinen">Seinen</button></div><div class="sort-row"><label for="sortSelect">Sort</label><select id="sortSelect"><option value="POPULARITY_DESC">Most popular</option><option value="START_DATE_DESC">Newest</option></select></div><div id="searchResults" class="search-results"></div></div></dialog>
+  <!-- SEARCH DIALOG -->
+  <dialog id="searchDialog">
+    <div class="dialog-inner">
+      <button class="close-btn" id="closeSearch">×</button>
+      <p class="eyebrow">SEARCH ALL FREE MANGA</p>
+      <h2>Find a<br><em>free story.</em></h2>
+      <form id="searchForm">
+        <input id="searchInput" autocomplete="off" placeholder="Title, author, free manga..." />
+        <button class="primary-btn">Search Free →</button>
+      </form>
+      <div class="filter-row">
+        <button class="filter active" data-genre="" data-tag="" data-free-search="all">All Free</button>
+        <button class="filter" data-free-search="mangadex">MangaDex</button>
+        <button class="filter" data-free-search="official">Official</button>
+        <button class="filter" data-free-search="public">Public Domain</button>
+        <button class="filter" data-genre="Action">Action</button>
+        <button class="filter" data-genre="Fantasy">Fantasy</button>
+        <button class="filter" data-genre="Romance">Romance</button>
+        <button class="filter" data-tag="Shounen">Shōnen</button>
+      </div>
+      <div class="sort-row">
+        <label for="sortSelect">Sort</label>
+        <select id="sortSelect">
+          <option value="POPULARITY_DESC">Most popular</option>
+          <option value="START_DATE_DESC">Newest</option>
+          <option value="FREE">Free Only</option>
+        </select>
+      </div>
+      <div id="searchResults" class="search-results"></div>
+    </div>
+  </dialog>
+
+  <!-- DETAIL DIALOG -->
   <dialog id="detailDialog"><div class="detail-inner"><button class="close-btn" id="closeDetail">×</button><div id="detailContent"></div></div></dialog>
+
+  <!-- UPLOAD DIALOG -->
+  <dialog id="uploadDialog">
+    <div class="dialog-inner" style="max-width:640px;">
+      <button class="close-btn" id="closeUpload">×</button>
+      <p class="eyebrow">UPLOAD ORIGINAL MANGA · LEGAL ONLY</p>
+      <h2>Publish your<br><em>manga.</em></h2>
+      <p class="hero-text" style="margin:12px 0 20px;">Upload your original creations only. Stored locally via IndexedDB. No copyrighted material. You keep all rights.</p>
+      
+      <form id="uploadForm">
+        <div style="display:grid;gap:14px;">
+          <div><label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">MANGA TITLE *</label><input id="uploadTitle" required placeholder="My Awesome Manga" style="width:100%;margin-top:6px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;" /></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">AUTHOR</label><input id="uploadAuthor" placeholder="Your name" style="width:100%;margin-top:6px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;" /></div>
+            <div><label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">STATUS</label><select id="uploadStatus" style="width:100%;margin-top:6px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;"><option value="ongoing">Ongoing</option><option value="completed">Completed</option><option value="hiatus">Hiatus</option><option value="oneshot">One-shot</option></select></div>
+          </div>
+          <div><label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">DESCRIPTION</label><textarea id="uploadDesc" placeholder="What's your manga about?" style="width:100%;margin-top:6px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;min-height:80px;resize:vertical;"></textarea></div>
+          <div><label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">TAGS (comma separated)</label><input id="uploadTags" placeholder="action, fantasy, adventure" style="width:100%;margin-top:6px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;" /></div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">COVER IMAGE</label>
+              <input type="file" id="uploadCover" accept="image/*" style="width:100%;margin-top:6px;padding:8px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;" />
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">CHAPTER PAGES (multiple)</label>
+              <input type="file" id="uploadPages" accept="image/*" multiple style="width:100%;margin-top:6px;padding:8px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;" />
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:10px;">
+            <button type="submit" class="primary-btn" style="flex:1;">Upload & Publish →</button>
+            <button type="button" class="ghost-btn" id="cancelUpload">Cancel</button>
+          </div>
+          
+          <p style="font-size:10px;color:#71717a;line-height:1.5;margin-top:8px;">By uploading, you confirm this is your original work and you have rights to publish it. No copyrighted manga from other creators. MangaVerse stores this locally in your browser — it never leaves your device unless you export it.</p>
+        </div>
+      </form>
+
+      <div id="uploadProgress" style="display:none;margin-top:20px;padding:16px;background:#111117;border-radius:12px;border:1px solid var(--line);">
+        <p style="margin:0 0 8px;font-weight:800;font-size:12px;">Uploading...</p>
+        <div style="height:6px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;"><div id="uploadBar" style="height:100%;background:#ff3b30;width:0%;transition:width .3s;"></div></div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ADD CHAPTER DIALOG -->
+  <dialog id="chapterDialog">
+    <div class="dialog-inner" style="max-width:520px;">
+      <button class="close-btn" id="closeChapter">×</button>
+      <p class="eyebrow">ADD CHAPTER · YOUR MANGA</p>
+      <h2>Add<br><em>chapter.</em></h2>
+      <form id="chapterForm" style="margin-top:20px;display:grid;gap:14px;">
+        <input type="hidden" id="chapterMangaId" />
+        <div><label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">CHAPTER NUMBER</label><input id="chapterNumber" required placeholder="1" style="width:100%;margin-top:6px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;" /></div>
+        <div><label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">CHAPTER TITLE</label><input id="chapterTitle" placeholder="The Beginning" style="width:100%;margin-top:6px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;" /></div>
+        <div><label style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#aaa7b0;">PAGES (multiple images, in order)</label><input type="file" id="chapterPages" accept="image/*" multiple required style="width:100%;margin-top:6px;padding:8px;border-radius:12px;border:1px solid var(--line);background:#111117;color:#fff;" /></div>
+        <button class="primary-btn">Add Chapter →</button>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="free-manga.js"></script>
+  <script src="upload.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
